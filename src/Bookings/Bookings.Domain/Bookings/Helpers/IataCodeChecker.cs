@@ -9,6 +9,6 @@ public static class IataCodeChecker
         for (var i = 0; i < length; i++)
             if (!char.IsDigit(code[i]) && (code[i] > 'Z' || code[i] < 'A'))
                 throw new FormatException($"{nameof(code)} must consist only of digits and letters A-Z. " +
-                                          $"Unexpected character: {code[i]}.");
+                                          $"Unexpected character {code[i]} at position {i}.");
     }
 }

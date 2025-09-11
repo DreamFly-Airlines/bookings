@@ -1,10 +1,14 @@
-﻿namespace Bookings.Domain.Bookings.Helpers;
+﻿namespace Bookings.Domain.Bookings.ValueObjects;
 
-public static class IanaTimezoneChecker
+public readonly record struct IanaTimezone
 {
-    public static void CheckOrThrow(string timezone)
+    private readonly string _value;
+    
+    private IanaTimezone(string value) => _value = value;
+    
+    public static IanaTimezone FromString(string @string)
     {
-        var regionAndCity = timezone.Split('/');
+        var regionAndCity = @string.Split('/');
         if (regionAndCity.Length != 2)
             throw new FormatException(
                 "The time zone in IANA format must consist of a region and a city, " +
@@ -12,7 +16,12 @@ public static class IanaTimezoneChecker
         var (region, city) = (regionAndCity[0], regionAndCity[1]);
         CheckCapitalizedOrThrow(region, nameof(region));
         CheckCapitalizedOrThrow(city, nameof(city));
+        return new(@string);
     }
+    
+    public static implicit operator string(IanaTimezone timezone) => timezone._value;
+    
+    public override string ToString() => _value;
 
     private static void CheckCapitalizedOrThrow(string @string, string paramName)
     {

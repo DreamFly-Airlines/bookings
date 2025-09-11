@@ -1,5 +1,5 @@
 ﻿using Bookings.Domain.Bookings.Entities;
-using Bookings.Infrastructure.Converter;
+using Bookings.Infrastructure.Converters;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bookings.Infrastructure.Persistence;
@@ -44,6 +44,7 @@ public partial class BookingsDbContext : DbContext
                 .ToView("aircrafts", "bookings");
 
             entity.Property(e => e.AircraftCode)
+                .HasConversion(new AircraftCodeValueConverter())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")
@@ -78,6 +79,7 @@ public partial class BookingsDbContext : DbContext
                 .HasConversion(new CoordinatesValueConverter())
                 .HasColumnName("coordinates");
             entity.Property(e => e.Timezone)
+                .HasConversion(new IanaTimeZoneValueConverter())
                 .HasComment("Airport time zone")
                 .HasColumnName("timezone");
         });
@@ -116,11 +118,13 @@ public partial class BookingsDbContext : DbContext
 
         modelBuilder.Entity<Booking>(entity =>
         {
-            entity.HasKey(e => e.BookRef).HasName("bookings_pkey");
+            entity.HasKey(e => e.BookRef)
+                .HasName("bookings_pkey");
 
             entity.ToTable("bookings", "bookings", tb => tb.HasComment("Bookings"));
 
             entity.Property(e => e.BookRef)
+                .HasConversion(new BookRefValueConverter())
                 .HasMaxLength(6)
                 .IsFixedLength()
                 .HasComment("Booking number")
@@ -153,6 +157,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Actual departure time")
                 .HasColumnName("actual_departure");
             entity.Property(e => e.AircraftCode)
+                .HasConversion(new AircraftCodeValueConverter())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")
@@ -226,6 +231,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Actual flight duration")
                 .HasColumnName("actual_duration");
             entity.Property(e => e.AircraftCode)
+                .HasConversion(new AircraftCodeValueConverter())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")
@@ -290,6 +296,7 @@ public partial class BookingsDbContext : DbContext
                 .ToView("routes", "bookings");
 
             entity.Property(e => e.AircraftCode)
+                .HasConversion(new AircraftCodeValueConverter())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")
@@ -336,6 +343,7 @@ public partial class BookingsDbContext : DbContext
             entity.ToTable("seats", "bookings", tb => tb.HasComment("Seats"));
 
             entity.Property(e => e.AircraftCode)
+                .HasConversion(new AircraftCodeValueConverter())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")
@@ -367,6 +375,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Ticket number")
                 .HasColumnName("ticket_no");
             entity.Property(e => e.BookRef)
+                .HasConversion(new BookRefValueConverter())
                 .HasMaxLength(6)
                 .IsFixedLength()
                 .HasComment("Booking number")

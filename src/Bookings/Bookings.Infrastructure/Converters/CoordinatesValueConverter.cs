@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NpgsqlTypes;
 
-namespace Bookings.Infrastructure.Converter;
+namespace Bookings.Infrastructure.Converters;
 
 public class CoordinatesValueConverter() : ValueConverter<Coordinates, NpgsqlPoint>(
     coordinates => new NpgsqlPoint(coordinates.Longitude, coordinates.Latitude),

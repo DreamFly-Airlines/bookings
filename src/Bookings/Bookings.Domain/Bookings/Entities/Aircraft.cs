@@ -1,16 +1,15 @@
-﻿using Bookings.Domain.Bookings.Helpers;
+﻿using Bookings.Domain.Bookings.ValueObjects;
 
 namespace Bookings.Domain.Bookings.Entities;
 
 public class Aircraft
 {
-    public string AircraftCode { get; }
+    public AircraftCode AircraftCode { get; }
     public string Model { get; }
     public int Range { get; }
 
-    public Aircraft(string aircraftCode, string model, int range)
+    public Aircraft(AircraftCode aircraftCode, string model, int range)
     {
-        IataCodeChecker.CheckOrThrow(aircraftCode, 3);
         AircraftCode = aircraftCode;
         Model = model;
         Range = range;

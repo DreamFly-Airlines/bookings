@@ -1,20 +1,19 @@
-﻿using Bookings.Domain.Bookings.Helpers;
+﻿using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Domain.Shared.Exceptions;
 
 namespace Bookings.Domain.Bookings.Entities;
 
 public class Booking
 {
-    public string BookRef { get; }
+    public BookRef BookRef { get; }
     public DateTime BookDate { get; }
     public decimal TotalAmount { get; private set; }
     public IReadOnlySet<string> TicketNumbers => _ticketNumbers;
 
     private readonly HashSet<string> _ticketNumbers;
     
-    public Booking(string bookRef, DateTime bookDate)
+    public Booking(BookRef bookRef, DateTime bookDate)
     {
-        IataCodeChecker.CheckOrThrow(bookRef, 6);
         BookRef = bookRef;
         BookDate = bookDate;
         TotalAmount = 0;

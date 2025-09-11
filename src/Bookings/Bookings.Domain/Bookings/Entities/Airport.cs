@@ -1,5 +1,4 @@
-﻿using Bookings.Domain.Bookings.Helpers;
-using Bookings.Domain.Bookings.ValueObjects;
+﻿using Bookings.Domain.Bookings.ValueObjects;
 
 namespace Bookings.Domain.Bookings.Entities;
 
@@ -9,12 +8,11 @@ public class Airport
     public string AirportName { get; }
     public string City { get; }
     public Coordinates Coordinates { get; }
-    public string Timezone { get; }
+    public IanaTimezone Timezone { get; }
 
-    public Airport(string airportCode, string airportName, string city, Coordinates coordinates, string timezone)
+    public Airport(string airportCode, string airportName, string city, Coordinates coordinates, IanaTimezone timezone)
     {
         CheckAirportCodeOrThrow(airportCode);
-        IanaTimezoneChecker.CheckOrThrow(timezone);
         AirportCode = airportCode;
         AirportName = airportName;
         City = city;

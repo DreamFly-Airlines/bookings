@@ -1,4 +1,5 @@
-﻿using Bookings.Infrastructure.Persistence.Models;
+﻿using Bookings.Domain.Bookings.Entities;
+using Bookings.Infrastructure.Converter;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bookings.Infrastructure.Persistence;
@@ -98,6 +99,7 @@ public partial class BookingsDbContext : DbContext
                 .HasColumnName("city");
             entity.Property(e => e.Coordinates)
                 .HasComment("Airport coordinates (longitude and latitude)")
+                .HasConversion(new CoordinatesValueConverter())
                 .HasColumnName("coordinates");
             entity.Property(e => e.Timezone)
                 .HasComment("Airport time zone")
@@ -125,6 +127,7 @@ public partial class BookingsDbContext : DbContext
                 .HasColumnName("city");
             entity.Property(e => e.Coordinates)
                 .HasComment("Airport coordinates (longitude and latitude)")
+                .HasConversion(new CoordinatesValueConverter())
                 .HasColumnName("coordinates");
             entity.Property(e => e.Timezone)
                 .HasComment("Airport time zone")

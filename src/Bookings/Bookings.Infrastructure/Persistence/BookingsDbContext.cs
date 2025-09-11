@@ -235,7 +235,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Flight status")
                 .HasColumnName("status");
 
-            entity.HasOne(d => d.AircraftCodeNavigation).WithMany(p => p.Flights)
+            entity.HasOne(d => d.AircraftCodeNavigation).WithMany()
                 .HasForeignKey(d => d.AircraftCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("flights_aircraft_code_fkey");

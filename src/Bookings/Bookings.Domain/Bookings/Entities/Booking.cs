@@ -1,4 +1,5 @@
 ﻿using Bookings.Domain.Bookings.Helpers;
+using Bookings.Domain.Shared.Exceptions;
 
 namespace Bookings.Domain.Bookings.Entities;
 
@@ -9,7 +10,7 @@ public class Booking
     public decimal TotalAmount { get; private set; }
     public IReadOnlySet<string> TicketNumbers => _ticketNumbers;
 
-    private HashSet<string> _ticketNumbers;
+    private readonly HashSet<string> _ticketNumbers;
     
     public Booking(string bookRef, DateTime bookDate)
     {
@@ -24,5 +25,9 @@ public class Booking
     {
         if (_ticketNumbers.Add(ticketNo))
             TotalAmount += ticketCost;
+        else
+            throw new InvalidDomainOperationException(
+                $"A {nameof(Booking)} with {nameof(BookRef)} \"{BookRef}\" " +
+                $"already has a {nameof(Ticket)} with {nameof(ticketNo)} \"{ticketNo}\".");
     }
 }

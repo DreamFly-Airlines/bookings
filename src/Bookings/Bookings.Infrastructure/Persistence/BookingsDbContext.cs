@@ -17,11 +17,7 @@ public partial class BookingsDbContext : DbContext
 
     public virtual DbSet<Aircraft> Aircrafts { get; set; }
 
-    public virtual DbSet<AircraftData> AircraftsData { get; set; }
-
     public virtual DbSet<Airport> Airports { get; set; }
-
-    public virtual DbSet<AirportsDatum> AirportsData { get; set; }
 
     public virtual DbSet<BoardingPass> BoardingPasses { get; set; }
 
@@ -60,26 +56,6 @@ public partial class BookingsDbContext : DbContext
                 .HasColumnName("range");
         });
 
-        modelBuilder.Entity<AircraftData>(entity =>
-        {
-            entity.HasKey(e => e.AircraftCode).HasName("aircrafts_pkey");
-
-            entity.ToTable("aircrafts_data", "bookings", tb => tb.HasComment("Aircrafts (internal data)"));
-
-            entity.Property(e => e.AircraftCode)
-                .HasMaxLength(3)
-                .IsFixedLength()
-                .HasComment("Aircraft code, IATA")
-                .HasColumnName("aircraft_code");
-            entity.Property(e => e.Model)
-                .HasComment("Aircraft model")
-                .HasColumnType("jsonb")
-                .HasColumnName("model");
-            entity.Property(e => e.Range)
-                .HasComment("Maximal flying distance, km")
-                .HasColumnName("range");
-        });
-
         modelBuilder.Entity<Airport>(entity =>
         {
             entity
@@ -96,34 +72,6 @@ public partial class BookingsDbContext : DbContext
                 .HasColumnName("airport_name");
             entity.Property(e => e.City)
                 .HasComment("City")
-                .HasColumnName("city");
-            entity.Property(e => e.Coordinates)
-                .HasComment("Airport coordinates (longitude and latitude)")
-                .HasConversion(new CoordinatesValueConverter())
-                .HasColumnName("coordinates");
-            entity.Property(e => e.Timezone)
-                .HasComment("Airport time zone")
-                .HasColumnName("timezone");
-        });
-
-        modelBuilder.Entity<AirportsDatum>(entity =>
-        {
-            entity.HasKey(e => e.AirportCode).HasName("airports_data_pkey");
-
-            entity.ToTable("airports_data", "bookings", tb => tb.HasComment("Airports (internal data)"));
-
-            entity.Property(e => e.AirportCode)
-                .HasMaxLength(3)
-                .IsFixedLength()
-                .HasComment("Airport code")
-                .HasColumnName("airport_code");
-            entity.Property(e => e.AirportName)
-                .HasComment("Airport name")
-                .HasColumnType("jsonb")
-                .HasColumnName("airport_name");
-            entity.Property(e => e.City)
-                .HasComment("City")
-                .HasColumnType("jsonb")
                 .HasColumnName("city");
             entity.Property(e => e.Coordinates)
                 .HasComment("Airport coordinates (longitude and latitude)")
@@ -235,17 +183,17 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Flight status")
                 .HasColumnName("status");
 
-            entity.HasOne(d => d.AircraftCodeNavigation).WithMany()
+            entity.HasOne(d => d.AircraftCode).WithMany()
                 .HasForeignKey(d => d.AircraftCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("flights_aircraft_code_fkey");
 
-            entity.HasOne(d => d.ArrivalAirportNavigation).WithMany(p => p.FlightArrivalAirportNavigations)
+            entity.HasOne(d => d.ArrivalAirport).WithMany()
                 .HasForeignKey(d => d.ArrivalAirport)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("flights_arrival_airport_fkey");
 
-            entity.HasOne(d => d.DepartureAirportNavigation).WithMany(p => p.FlightDepartureAirportNavigations)
+            entity.HasOne(d => d.DepartureAirport).WithMany()
                 .HasForeignKey(d => d.DepartureAirport)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("flights_departure_airport_fkey");
@@ -398,7 +346,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Travel class")
                 .HasColumnName("fare_conditions");
 
-            entity.HasOne(d => d.AircraftCodeNavigation).WithMany(p => p.Seats)
+            entity.HasOne(d => d.AircraftCode).WithMany()
                 .HasForeignKey(d => d.AircraftCode)
                 .HasConstraintName("seats_aircraft_code_fkey");
         });

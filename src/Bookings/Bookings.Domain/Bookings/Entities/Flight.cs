@@ -12,7 +12,7 @@ public class Flight
     public string AircraftCode { get; set; } = null!;
     public DateTime? ActualDeparture { get; set; }
     public DateTime? ActualArrival { get; set; }
-    public virtual AircraftsDatum AircraftCodeNavigation { get; set; } = null!;
+    public virtual AircraftData AircraftCodeNavigation { get; set; } = null!;
     public virtual AirportsDatum ArrivalAirportNavigation { get; set; } = null!;
     public virtual AirportsDatum DepartureAirportNavigation { get; set; } = null!;
     public virtual ICollection<TicketFlight> TicketFlights { get; set; } = new List<TicketFlight>();

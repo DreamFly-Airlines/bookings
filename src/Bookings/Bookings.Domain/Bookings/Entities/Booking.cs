@@ -1,4 +1,4 @@
-﻿using Bookings.Domain.Bookings.Exceptions;
+﻿using Bookings.Domain.Bookings.Helpers;
 
 namespace Bookings.Domain.Bookings.Entities;
 
@@ -6,24 +6,23 @@ public class Booking
 {
     public string BookRef { get; }
     public DateTime BookDate { get; }
-    public decimal TotalAmount { get; }
-    public IReadOnlyList<Ticket> Tickets { get; } = new List<Ticket>();
+    public decimal TotalAmount { get; private set; }
+    public IReadOnlySet<string> TicketNumbers => _ticketNumbers;
 
-    public Booking(string bookRef, DateTime bookDate, decimal totalAmount, IReadOnlyList<Ticket> tickets)
+    private HashSet<string> _ticketNumbers;
+    
+    public Booking(string bookRef, DateTime bookDate)
     {
-        CheckBookRefFormatOrThrow(bookRef);
+        IataCodeChecker.CheckOrThrow(bookRef, 6);
         BookRef = bookRef;
         BookDate = bookDate;
-        TotalAmount = totalAmount;
+        TotalAmount = 0;
+        _ticketNumbers = [];
     }
 
-    private static void CheckBookRefFormatOrThrow(string bookRef)
+    public void AddTicket(string ticketNo, decimal ticketCost)
     {
-        if (bookRef.Length != 6)
-            throw new InvalidIdFormat($"{nameof(BookRef)} must have 6 digits.");
-        for (var i = 0; i < 6; i++)
-            if (!char.IsDigit(bookRef[i]) && (bookRef[i] > 'Z' || bookRef[i] < 'A'))
-                throw new InvalidIdFormat($"{nameof(BookRef)} must consist only of digits and letters A-Z. " +
-                                          $"Unexpected character: {bookRef[i]}");
+        if (_ticketNumbers.Add(ticketNo))
+            TotalAmount += ticketCost;
     }
 }

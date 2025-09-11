@@ -17,7 +17,7 @@ public partial class BookingsDbContext : DbContext
 
     public virtual DbSet<Aircraft> Aircrafts { get; set; }
 
-    public virtual DbSet<AircraftsDatum> AircraftsData { get; set; }
+    public virtual DbSet<AircraftData> AircraftsData { get; set; }
 
     public virtual DbSet<Airport> Airports { get; set; }
 
@@ -60,7 +60,7 @@ public partial class BookingsDbContext : DbContext
                 .HasColumnName("range");
         });
 
-        modelBuilder.Entity<AircraftsDatum>(entity =>
+        modelBuilder.Entity<AircraftData>(entity =>
         {
             entity.HasKey(e => e.AircraftCode).HasName("aircrafts_pkey");
 
@@ -431,7 +431,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Passenger name")
                 .HasColumnName("passenger_name");
 
-            entity.HasOne(d => d.BookRefNavigation).WithMany(p => p.Tickets)
+            entity.HasOne(d => d.BookRefNavigation).WithMany()
                 .HasForeignKey(d => d.BookRef)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("tickets_book_ref_fkey");

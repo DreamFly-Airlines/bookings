@@ -1,10 +1,19 @@
-﻿namespace Bookings.Domain.Bookings.Entities;
+﻿using Bookings.Domain.Bookings.ValueObjects;
+
+namespace Bookings.Domain.Bookings.Entities;
 
 public class BoardingPass
 {
-    public string TicketNo { get; set; } = null!;
-    public int FlightId { get; set; }
-    public int BoardingNo { get; set; }
-    public string SeatNo { get; set; } = null!;
-    public virtual TicketFlight TicketFlight { get; set; } = null!;
+    public TicketNo TicketNo { get; }
+    public int FlightId { get; }
+    public int BoardingNo { get; }
+    public string SeatNo { get; }
+
+    public BoardingPass(TicketNo ticketNo, int flightId, int boardingNo, string seatNo)
+    {
+        TicketNo = ticketNo;
+        FlightId = flightId;
+        BoardingNo = boardingNo;
+        SeatNo = seatNo;
+    }
 }

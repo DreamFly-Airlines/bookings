@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Bookings.Infrastructure.Persistence.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bookings.Infrastructure.Persistence.Models;
+namespace Bookings.Infrastructure.Persistence;
 
 public partial class BookingsDbContext : DbContext
 {
@@ -38,10 +37,6 @@ public partial class BookingsDbContext : DbContext
     public virtual DbSet<Ticket> Tickets { get; set; }
 
     public virtual DbSet<TicketFlight> TicketFlights { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=DreamFly;Username=postgres;Password=postgres");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

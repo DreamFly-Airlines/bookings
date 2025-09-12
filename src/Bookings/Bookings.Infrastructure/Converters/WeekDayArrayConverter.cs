@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Bookings.Infrastructure.Converters;
 
-public class WeekDayConverter() : ValueConverter<WeekDay, string>(
-    enumConditions => ConvertToString(enumConditions), 
-    stringConditions => ConvertToWeekDay(stringConditions))
+public class WeekDayArrayConverter() : ValueConverter<List<WeekDay>, string[]>(
+    enumDays => enumDays.Select(ConvertToString).ToArray(), 
+    stringDays => stringDays.Select(ConvertToWeekDay).ToList())
 {
     private const string MondayName = "0";
     private const string TuesdayName = "1";
@@ -14,7 +14,6 @@ public class WeekDayConverter() : ValueConverter<WeekDay, string>(
     private const string FridayName = "4";
     private const string SaturdayName = "5";
     private const string SundayName = "6";
-    
     
     private static string ConvertToString(WeekDay weekDay) => weekDay switch
     {

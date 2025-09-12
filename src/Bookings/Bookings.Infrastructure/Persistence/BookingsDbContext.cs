@@ -322,7 +322,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("City of arrival")
                 .HasColumnName("arrival_city");
             entity.Property(e => e.DaysOfWeek)
-                .HasConversion(new WeekDayConverter())
+                .HasConversion(new WeekDayArrayConverter())
                 .HasComment("Days of week on which flights are scheduled")
                 .HasColumnName("days_of_week");
             entity.Property(e => e.DepartureAirport)

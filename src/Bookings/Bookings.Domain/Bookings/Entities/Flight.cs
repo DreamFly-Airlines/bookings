@@ -60,11 +60,11 @@ public class Flight
 
     public void OpenForRegister(bool isDelayed)
     {
-        if (Status is FlightStatus.Scheduled)
-            Status = isDelayed ? FlightStatus.Delayed : FlightStatus.OnTime;
-        throw new InvalidDomainOperationException(
-            $"The status of {nameof(Flight)} with {nameof(FlightNo)} \"{FlightNo}\" " +
-            $"and {nameof(ScheduledDeparture)} \"{ScheduledDeparture}\" is {Status}.");
+        if (Status is not FlightStatus.Scheduled)
+            throw new InvalidDomainOperationException(
+                $"The status of {nameof(Flight)} with {nameof(FlightNo)} \"{FlightNo}\" " +
+                $"and {nameof(ScheduledDeparture)} \"{ScheduledDeparture}\" is {Status}.");
+        Status = isDelayed ? FlightStatus.Delayed : FlightStatus.OnTime;
     }
 
     private void SetStatusOrThrow(FlightStatus status, params IEnumerable<FlightStatus> conflictingStatuses)

@@ -361,6 +361,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Seat number")
                 .HasColumnName("seat_no");
             entity.Property(e => e.FareConditions)
+                .HasConversion(new FareConditionsConverter())
                 .HasMaxLength(10)
                 .HasComment("Travel class")
                 .HasColumnName("fare_conditions");

@@ -1,15 +1,20 @@
-﻿namespace Bookings.Domain.Bookings.Entities;
+﻿using Bookings.Domain.Bookings.Enums;
+using Bookings.Domain.Bookings.ValueObjects;
+
+namespace Bookings.Domain.Bookings.Entities;
 
 public class TicketFlight
 {
-    public string TicketNo { get; set; } = null!;
-    public int FlightId { get; set; }
-    public string FareConditions { get; set; } = null!;
-    public decimal Amount { get; set; }
+    public TicketNo TicketNo { get; }
+    public int FlightId { get; }
+    public FareConditions FareConditions { get; }
+    public decimal Amount { get; }
 
-    public virtual BoardingPass? BoardingPass { get; set; }
-
-    public virtual Flight Flight { get; set; } = null!;
-
-    public virtual Ticket TicketNoNavigation { get; set; } = null!;
+    public TicketFlight(TicketNo ticketNo, int flightId, FareConditions fareConditions, decimal amount)
+    {
+        TicketNo = ticketNo;
+        FlightId = flightId;
+        FareConditions = fareConditions;
+        Amount = amount;
+    }
 }

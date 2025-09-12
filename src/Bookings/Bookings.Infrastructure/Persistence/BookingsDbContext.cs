@@ -1,4 +1,5 @@
 ﻿using Bookings.Domain.Bookings.Entities;
+using Bookings.Domain.Bookings.Enums;
 using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Infrastructure.Converters;
 using Microsoft.EntityFrameworkCore;
@@ -77,7 +78,7 @@ public partial class BookingsDbContext : DbContext
                 .HasColumnName("city");
             entity.Property(e => e.Coordinates)
                 .HasComment("Airport coordinates (longitude and latitude)")
-                .HasConversion(new CoordinatesValueConverter())
+                .HasConversion(new CoordinatesConverter())
                 .HasColumnName("coordinates");
             entity.Property(e => e.Timezone)
                 .HasConversion(new StringBackedStructConverter<IanaTimezone>(IanaTimezone.FromString))
@@ -96,6 +97,7 @@ public partial class BookingsDbContext : DbContext
             entity.HasIndex(e => new { e.FlightId, e.SeatNo }, "boarding_passes_flight_id_seat_no_key").IsUnique();
 
             entity.Property(e => e.TicketNo)
+                .HasConversion(new StringBackedStructConverter<TicketNo>(TicketNo.FromString))
                 .HasMaxLength(13)
                 .IsFixedLength()
                 .HasComment("Ticket number")
@@ -165,16 +167,19 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Aircraft code, IATA")
                 .HasColumnName("aircraft_code");
             entity.Property(e => e.ArrivalAirport)
+                .HasConversion(new StringBackedStructConverter<IataAirportCode>(IataAirportCode.FromString))
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Airport of arrival")
                 .HasColumnName("arrival_airport");
             entity.Property(e => e.DepartureAirport)
+                .HasConversion(new StringBackedStructConverter<IataAirportCode>(IataAirportCode.FromString))
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Airport of departure")
                 .HasColumnName("departure_airport");
             entity.Property(e => e.FlightNo)
+                .HasConversion(new StringBackedStructConverter<FlightNo>(FlightNo.FromString))
                 .HasMaxLength(6)
                 .IsFixedLength()
                 .HasComment("Flight number")
@@ -186,6 +191,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Scheduled departure time")
                 .HasColumnName("scheduled_departure");
             entity.Property(e => e.Status)
+                .HasConversion(new FlightStatusConverter())
                 .HasMaxLength(20)
                 .HasComment("Flight status")
                 .HasColumnName("status");
@@ -372,6 +378,7 @@ public partial class BookingsDbContext : DbContext
             entity.ToTable("tickets", "bookings", tb => tb.HasComment("Tickets"));
 
             entity.Property(e => e.TicketNo)
+                .HasConversion(new StringBackedStructConverter<TicketNo>(TicketNo.FromString))
                 .HasMaxLength(13)
                 .IsFixedLength()
                 .HasComment("Ticket number")
@@ -408,6 +415,7 @@ public partial class BookingsDbContext : DbContext
             entity.ToTable("ticket_flights", "bookings", tb => tb.HasComment("Flight segment"));
 
             entity.Property(e => e.TicketNo)
+                .HasConversion(new StringBackedStructConverter<TicketNo>(TicketNo.FromString))
                 .HasMaxLength(13)
                 .IsFixedLength()
                 .HasComment("Ticket number")

@@ -8,9 +8,9 @@ public class Booking
     public BookRef BookRef { get; }
     public DateTime BookDate { get; }
     public decimal TotalAmount { get; private set; }
-    public IReadOnlySet<string> TicketNumbers => _ticketNumbers;
+    public IReadOnlySet<TicketNo> TicketNumbers => _ticketNumbers;
 
-    private readonly HashSet<string> _ticketNumbers;
+    private readonly HashSet<TicketNo> _ticketNumbers;
     
     public Booking(BookRef bookRef, DateTime bookDate)
     {
@@ -20,7 +20,7 @@ public class Booking
         _ticketNumbers = [];
     }
 
-    public void AddTicket(string ticketNo, decimal ticketCost)
+    public void AddTicket(TicketNo ticketNo, decimal ticketCost)
     {
         if (_ticketNumbers.Add(ticketNo))
             TotalAmount += ticketCost;

@@ -7,14 +7,14 @@ public readonly record struct TicketNo
     
     private TicketNo(string value) => _value = value;
     
-    private static TicketNo FromString(string @string)
+    public static TicketNo FromString(string @string)
     {
         if (@string.Length != TicketNoLength)
             throw new FormatException($"{nameof(@string)} should be exactly {TicketNoLength} characters");
         for (var i = 0; i < @string.Length; i++)
             if (!char.IsDigit(@string[i]))
                 throw new FormatException(
-                    $"{nameof(@string)} must consist only of numbers " +
+                    $"{nameof(@string)} must consist only of numbers. " +
                     $"Unexpected character {@string[i]} at position {i}.");
         return new(@string);
     }

@@ -1,16 +1,78 @@
-﻿namespace Bookings.Domain.Bookings.Entities;
+﻿using Bookings.Domain.Bookings.Enums;
+using Bookings.Domain.Bookings.ValueObjects;
+using Bookings.Domain.Shared.Exceptions;
+
+namespace Bookings.Domain.Bookings.Entities;
 
 public class Flight
 {
-    public int FlightId { get; set; }
-    public string FlightNo { get; set; } = null!;
-    public DateTime ScheduledDeparture { get; set; }
-    public DateTime ScheduledArrival { get; set; }
-    public string DepartureAirport { get; set; } = null!;
-    public string ArrivalAirport { get; set; } = null!;
-    public string Status { get; set; } = null!;
-    public string AircraftCode { get; set; } = null!;
+    public int FlightId { get; }
+    public FlightNo FlightNo { get;  }
+    public DateTime ScheduledDeparture { get; }
+    public DateTime ScheduledArrival { get; }
+    public IataAirportCode DepartureAirport { get; }
+    public IataAirportCode ArrivalAirport { get; }
+    public FlightStatus Status { get; private set; }
+    public AircraftCode AircraftCode { get; }
     public DateTime? ActualDeparture { get; set; }
-    public DateTime? ActualArrival { get; set; }
-    public virtual ICollection<TicketFlight> TicketFlights { get; set; } = new List<TicketFlight>();
+    public DateTime? ActualArrival { get; }
+
+    public Flight(
+        int flightId, 
+        FlightNo flightNo, 
+        DateTime scheduledDeparture, 
+        DateTime scheduledArrival, 
+        IataAirportCode departureAirport,
+        IataAirportCode arrivalAirport,
+        AircraftCode aircraftCode)
+    {
+        FlightId = flightId;
+        FlightNo = flightNo;
+        ScheduledDeparture = scheduledDeparture;
+        ScheduledArrival = scheduledArrival;
+        DepartureAirport = departureAirport;
+        ArrivalAirport = arrivalAirport;
+        AircraftCode = aircraftCode;
+        Status = FlightStatus.Scheduled;
+        ActualDeparture = null;
+        ActualArrival = null;
+    }
+
+    public void MarkAsArrived(DateTime arrivalTime)
+    {
+        SetStatusOrThrow(FlightStatus.Arrived, 
+            FlightStatus.Cancelled, FlightStatus.Arrived, FlightStatus.Departed);
+        ActualDeparture = arrivalTime;
+    }
+
+    public void MarkAsDeparted(DateTime departureTime)
+    {
+        SetStatusOrThrow(FlightStatus.Departed, 
+            FlightStatus.Cancelled, FlightStatus.Arrived, FlightStatus.Departed);
+        ActualDeparture = departureTime;
+    }
+    
+    public void Delay()
+    {
+        SetStatusOrThrow(FlightStatus.Delayed, 
+            FlightStatus.Cancelled, FlightStatus.Arrived, FlightStatus.Departed);
+    }
+
+    public void OpenForRegister(bool isDelayed)
+    {
+        if (Status is FlightStatus.Scheduled)
+            Status = isDelayed ? FlightStatus.Delayed : FlightStatus.OnTime;
+        throw new InvalidDomainOperationException(
+            $"The status of {nameof(Flight)} with {nameof(FlightNo)} \"{FlightNo}\" " +
+            $"and {nameof(ScheduledDeparture)} \"{ScheduledDeparture}\" is {Status}.");
+    }
+
+    private void SetStatusOrThrow(FlightStatus status, params IEnumerable<FlightStatus> conflictingStatuses)
+    {
+        if (conflictingStatuses.Contains(Status))
+            throw new InvalidDomainOperationException(
+                $"The status of {nameof(Flight)} with {nameof(FlightNo)} \"{FlightNo}\" " +
+                $"and {nameof(ScheduledDeparture)} \"{ScheduledDeparture}\" is {Status}.");
+        Status = status;
+    }
 }

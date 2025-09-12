@@ -7,7 +7,7 @@ public readonly record struct IataAirportCode
     
     private IataAirportCode(string value) => _value = value;
     
-    private static IataAirportCode FromString(string @string)
+    public static IataAirportCode FromString(string @string)
     {
         if (@string.Length != IataAirportCodeLength)
             throw new FormatException($"{nameof(@string)} should be exactly {IataAirportCodeLength} characters");

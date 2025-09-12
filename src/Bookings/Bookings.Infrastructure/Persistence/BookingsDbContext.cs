@@ -112,12 +112,11 @@ public partial class BookingsDbContext : DbContext
                 .HasMaxLength(4)
                 .HasComment("Seat number")
                 .HasColumnName("seat_no");
-
-            // TODO
-            /*entity.HasOne(d => d.TicketFlight).WithOne(p => p.BoardingPass)
+            entity.HasOne<TicketFlight>()
+                .WithOne()
                 .HasForeignKey<BoardingPass>(d => new { d.TicketNo, d.FlightId })
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("boarding_passes_ticket_no_fkey");*/
+                .HasConstraintName("boarding_passes_ticket_no_fkey");
         });
 
         modelBuilder.Entity<Booking>(entity =>
@@ -195,24 +194,21 @@ public partial class BookingsDbContext : DbContext
                 .HasMaxLength(20)
                 .HasComment("Flight status")
                 .HasColumnName("status");
-
-            // TODO
-            /*entity.HasOne(d => d.AircraftCodeNavigation).WithMany(p => p.Flights)
+            entity.HasOne<Aircraft>()
+                .WithMany()
                 .HasForeignKey(d => d.AircraftCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("flights_aircraft_code_fkey");*/
-
-            // TODO
-            /*entity.HasOne(d => d.ArrivalAirportNavigation).WithMany(p => p.FlightArrivalAirportNavigations)
+                .HasConstraintName("flights_aircraft_code_fkey");
+            entity.HasOne<Airport>()
+                .WithMany()
                 .HasForeignKey(d => d.ArrivalAirport)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("flights_arrival_airport_fkey");*/
-
-            // TODO
-            /*entity.HasOne(d => d.DepartureAirportNavigation).WithMany(p => p.FlightDepartureAirportNavigations)
+                .HasConstraintName("flights_arrival_airport_fkey");
+            entity.HasOne<Airport>()
+                .WithMany()
                 .HasForeignKey(d => d.DepartureAirport)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("flights_departure_airport_fkey");*/
+                .HasConstraintName("flights_departure_airport_fkey");
         });
 
         modelBuilder.Entity<FlightsV>(entity =>
@@ -369,11 +365,10 @@ public partial class BookingsDbContext : DbContext
                 .HasMaxLength(10)
                 .HasComment("Travel class")
                 .HasColumnName("fare_conditions");
-
-            // TODO
-            /*entity.HasOne(d => d.AircraftCodeNavigation).WithMany(p => p.Seats)
+            entity.HasOne<Aircraft>()
+                .WithMany()
                 .HasForeignKey(d => d.AircraftCode)
-                .HasConstraintName("seats_aircraft_code_fkey");*/
+                .HasConstraintName("seats_aircraft_code_fkey");
         });
 
         modelBuilder.Entity<Ticket>(entity =>
@@ -406,12 +401,11 @@ public partial class BookingsDbContext : DbContext
             entity.Property(e => e.PassengerName)
                 .HasComment("Passenger name")
                 .HasColumnName("passenger_name");
-
-            // TODO
-            /*entity.HasOne(d => d.BookRefNavigation).WithMany(p => p.Tickets)
+            entity.HasOne<Booking>()
+                .WithMany()
                 .HasForeignKey(d => d.BookRef)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("tickets_book_ref_fkey");*/
+                .HasConstraintName("tickets_book_ref_fkey");
         });
 
         modelBuilder.Entity<TicketFlight>(entity =>
@@ -437,18 +431,16 @@ public partial class BookingsDbContext : DbContext
                 .HasMaxLength(10)
                 .HasComment("Travel class")
                 .HasColumnName("fare_conditions");
-
-            // TODO
-            /*entity.HasOne(d => d.Flight).WithMany(p => p.TicketFlights)
+            entity.HasOne<Flight>()
+                .WithMany()
                 .HasForeignKey(d => d.FlightId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("ticket_flights_flight_id_fkey");*/
-
-            // TODO
-            /*entity.HasOne(d => d.TicketNoNavigation).WithMany(p => p.TicketFlights)
+                .HasConstraintName("ticket_flights_flight_id_fkey");
+            entity.HasOne<Ticket>()
+                .WithMany()
                 .HasForeignKey(d => d.TicketNo)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("ticket_flights_ticket_no_fkey");*/
+                .HasConstraintName("ticket_flights_ticket_no_fkey");
         });
 
         OnModelCreatingPartial(modelBuilder);

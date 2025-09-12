@@ -13,8 +13,8 @@ public class Route
     public string ArrivalAirportName { get; }
     public string ArrivalCity { get; }
     public AircraftCode AircraftCode { get; }
-    public TimeSpan? Duration { get; }
-    public List<WeekDay>? DaysOfWeek { get; }
+    public TimeSpan Duration { get; }
+    public List<WeekDay> DaysOfWeek { get; }
     
     public Route(
         FlightNo flightNo, 
@@ -25,8 +25,8 @@ public class Route
         string arrivalAirportName, 
         string arrivalCity, 
         AircraftCode aircraftCode, 
-        TimeSpan? duration, 
-        List<WeekDay>? daysOfWeek)
+        TimeSpan duration, 
+        List<WeekDay> daysOfWeek)
     {
         FlightNo = flightNo;
         DepartureAirport = departureAirport;

@@ -391,6 +391,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Booking number")
                 .HasColumnName("book_ref");
             entity.Property(e => e.ContactData)
+                .HasConversion(new ContactDataConverter())
                 .HasComment("Passenger contact information")
                 .HasColumnType("jsonb")
                 .HasColumnName("contact_data");

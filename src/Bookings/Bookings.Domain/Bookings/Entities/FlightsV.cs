@@ -1,5 +1,8 @@
 ﻿namespace Bookings.Domain.Bookings.Entities;
 
+// TODO: it's used only for additional info for Flight
+// maybe we should move it to infrastructure or application and make ReadModel
+
 public class FlightsV
 {
     public int? FlightId { get; set; }

@@ -310,6 +310,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Aircraft code, IATA")
                 .HasColumnName("aircraft_code");
             entity.Property(e => e.ArrivalAirport)
+                .HasConversion(new StringBackedStructConverter<IataAirportCode>(IataAirportCode.FromString))
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Code of airport of arrival")
@@ -321,9 +322,11 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("City of arrival")
                 .HasColumnName("arrival_city");
             entity.Property(e => e.DaysOfWeek)
+                .HasConversion(new WeekDayConverter())
                 .HasComment("Days of week on which flights are scheduled")
                 .HasColumnName("days_of_week");
             entity.Property(e => e.DepartureAirport)
+                .HasConversion(new StringBackedStructConverter<IataAirportCode>(IataAirportCode.FromString))
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Code of airport of departure")
@@ -338,6 +341,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Scheduled duration of flight")
                 .HasColumnName("duration");
             entity.Property(e => e.FlightNo)
+                .HasConversion(new StringBackedStructConverter<FlightNo>(FlightNo.FromString))
                 .HasMaxLength(6)
                 .IsFixedLength()
                 .HasComment("Flight number")

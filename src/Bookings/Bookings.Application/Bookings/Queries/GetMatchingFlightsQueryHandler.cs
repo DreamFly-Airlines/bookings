@@ -16,12 +16,11 @@ public class GetMatchingFlightsQueryHandler(
                     flight.DepartureCity == query.DepartureCity &&
                     flight.ArrivalCity == query.ArrivalCity && 
                     ((flight.Status == FlightStatus.Scheduled || flight.Status == FlightStatus.OnTime) 
-                        && flight.ScheduledDeparture.Date == query.DepartureDate
+                        && DateOnly.FromDateTime(flight.ScheduledDeparture) == query.DepartureDate
                      || 
                      (flight.Status == FlightStatus.Delayed 
-                        && flight.ActualDeparture!.Value.Date == query.DepartureDate.Date)),
+                        && DateOnly.FromDateTime(flight.ActualDeparture!.Value) == query.DepartureDate)),
                 cancellationToken);
-
         return flights;
     }
 }

@@ -6,5 +6,5 @@ namespace Bookings.Application.Bookings.Queries;
 public record GetMatchingFlightsQuery(
     string DepartureCity, 
     string ArrivalCity, 
-    DateTime DepartureDate, 
+    DateOnly DepartureDate, 
     int PassengersCount) : IQuery<List<FlightReadModel>>;

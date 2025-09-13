@@ -1,4 +1,4 @@
-﻿namespace Bookings.Application.Bookings.Abstractions;
+﻿namespace Bookings.Application.Abstractions;
 
 public interface IQueryHandler<in TQuery, T> where TQuery : IQuery<T>
 {

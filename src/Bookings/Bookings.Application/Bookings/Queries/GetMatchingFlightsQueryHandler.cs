@@ -1,4 +1,4 @@
-﻿using Bookings.Application.Bookings.Abstractions;
+﻿using Bookings.Application.Abstractions;
 using Bookings.Domain.Bookings.Entities;
 
 namespace Bookings.Application.Bookings.Queries;

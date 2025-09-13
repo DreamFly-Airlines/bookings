@@ -1,6 +1,6 @@
-﻿namespace Bookings.Application.Bookings.Abstractions;
+﻿namespace Bookings.Application.Abstractions;
 
-public interface IQueriesSender
+public interface IQuerySender
 {
     public Task<T> SendAsync<T>(IQuery<T> query, CancellationToken cancellationToken = default);
 }

@@ -1,10 +1,10 @@
-﻿using Bookings.Application.Bookings.Abstractions;
+﻿using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bookings.Api.Controllers;
 
-public class BookingController(IQueriesSender sender) : Controller
+public class BookingController(IQuerySender sender) : Controller
 {
     [HttpGet("/flights")]
     public async Task<IActionResult> FindMatchingFlights(

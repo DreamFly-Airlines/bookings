@@ -1,5 +1,4 @@
 ﻿using Bookings.Domain.Bookings.Entities;
-using Bookings.Domain.Bookings.Enums;
 using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Infrastructure.Converters;
 using Microsoft.EntityFrameworkCore;
@@ -41,9 +40,8 @@ public partial class BookingsDbContext : DbContext
     {
         modelBuilder.Entity<Aircraft>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToView("aircrafts", "bookings");
+            entity.HasKey(a => a.AircraftCode);
+            entity.ToView("aircrafts", "bookings");
 
             entity.Property(e => e.AircraftCode)
                 .HasConversion(new StringBackedStructConverter<AircraftCode>(AircraftCode.FromString))
@@ -61,11 +59,11 @@ public partial class BookingsDbContext : DbContext
 
         modelBuilder.Entity<Airport>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToView("airports", "bookings");
+            entity.HasKey(a => a.AirportCode);
+            entity.ToView("airports", "bookings");
 
             entity.Property(e => e.AirportCode)
+                .HasConversion(new StringBackedStructConverter<IataAirportCode>(IataAirportCode.FromString))
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Airport code")
@@ -235,7 +233,6 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Actual flight duration")
                 .HasColumnName("actual_duration");
             entity.Property(e => e.AircraftCode)
-                .HasConversion(new StringBackedStructConverter<AircraftCode>(AircraftCode.FromString))
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")

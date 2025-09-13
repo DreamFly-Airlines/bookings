@@ -12,7 +12,7 @@ public class FlightsController(IQuerySender sender) : Controller
     [HttpGet("search")]
     public async Task<IActionResult> FindMatchingFlights([FromQuery] FlightsSearchDto dto)
     {
-        var query = new GetMatchingFlightsQuery(
+        var query = new SearchMatchingFlightsQuery(
             dto.DepartureCity, 
             dto.ArrivalCity, 
             dto.DepartureDate, 

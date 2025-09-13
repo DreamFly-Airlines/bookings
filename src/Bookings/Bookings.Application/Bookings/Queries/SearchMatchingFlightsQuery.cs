@@ -3,7 +3,7 @@ using Bookings.Application.Bookings.ReadModels.ReadModels;
 
 namespace Bookings.Application.Bookings.Queries;
 
-public record GetMatchingFlightsQuery(
+public record SearchMatchingFlightsQuery(
     string DepartureCity, 
     string ArrivalCity, 
     DateOnly DepartureDate, 

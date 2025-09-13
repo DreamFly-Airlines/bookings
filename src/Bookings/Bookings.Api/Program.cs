@@ -15,7 +15,7 @@ builder.Services.AddNpgsql<BookingsDbContext>(builder.Configuration.GetConnectio
 builder.Services.AddScoped<IQuerySender, ServiceProviderQuerySender>();
 builder.Services.AddScoped<IFlightReadModelRepository, SqlFlightReadModelRepository>();
 
-builder.Services.AddQueryHandlers(typeof(GetMatchingFlightsQueryHandler).Assembly);
+builder.Services.AddQueryHandlers(typeof(SearchMatchingFlightsQueryHandler).Assembly);
 
 builder.Services.AddEndpointsApiExplorer(); 
 builder.Services.AddSwaggerGen();

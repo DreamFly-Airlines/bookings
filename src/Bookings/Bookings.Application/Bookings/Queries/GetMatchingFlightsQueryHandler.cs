@@ -1,12 +1,27 @@
 ﻿using Bookings.Application.Abstractions;
-using Bookings.Domain.Bookings.Entities;
-
+using Bookings.Application.Bookings.ReadModels.ReadModels;
+using Bookings.Application.Bookings.ReadModels.Repositories;
+using Bookings.Domain.Bookings.Enums;
 namespace Bookings.Application.Bookings.Queries;
 
-public class GetMatchingFlightsQueryHandler : IQueryHandler<GetMatchingFlightsQuery, IEnumerable<Flight>>
+public class GetMatchingFlightsQueryHandler(
+    IFlightReadModelRepository flightReadModelRepository) 
+    : IQueryHandler<GetMatchingFlightsQuery, List<FlightReadModel>>
 {
-    public Task<IEnumerable<Flight>> HandleAsync(GetMatchingFlightsQuery query, CancellationToken cancellationToken = default)
+    public async Task<List<FlightReadModel>> HandleAsync(
+        GetMatchingFlightsQuery query, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var flights = await flightReadModelRepository
+            .Where(flight =>
+                    flight.DepartureCity == query.DepartureCity &&
+                    flight.ArrivalCity == query.ArrivalCity && 
+                    ((flight.Status == FlightStatus.Scheduled || flight.Status == FlightStatus.OnTime) 
+                        && flight.ScheduledDeparture.Date == query.DepartureDate
+                     || 
+                     (flight.Status == FlightStatus.Delayed 
+                        && flight.ActualDeparture!.Value.Date == query.DepartureDate.Date)),
+                cancellationToken);
+
+        return flights;
     }
 }

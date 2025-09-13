@@ -1,4 +1,6 @@
-﻿using Bookings.Domain.Bookings.Entities;
+﻿using Bookings.Application.Bookings.ReadModels;
+using Bookings.Application.Bookings.ReadModels.ReadModels;
+using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Infrastructure.Converters;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +28,7 @@ public partial class BookingsDbContext : DbContext
 
     public virtual DbSet<Flight> Flights { get; set; }
 
-    public virtual DbSet<FlightsV> FlightsVs { get; set; }
+    public virtual DbSet<FlightReadModel> FlightsView { get; set; }
 
     public virtual DbSet<Route> Routes { get; set; }
 
@@ -209,7 +211,7 @@ public partial class BookingsDbContext : DbContext
                 .HasConstraintName("flights_departure_airport_fkey");
         });
 
-        modelBuilder.Entity<FlightsV>(entity =>
+        modelBuilder.Entity<FlightReadModel>(entity =>
         {
             entity
                 .HasNoKey()
@@ -233,11 +235,13 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Actual flight duration")
                 .HasColumnName("actual_duration");
             entity.Property(e => e.AircraftCode)
+                .HasConversion(new StringBackedDataConverter<AircraftCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")
                 .HasColumnName("aircraft_code");
             entity.Property(e => e.ArrivalAirport)
+                .HasConversion(new StringBackedDataConverter<IataAirportCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Arrival airport code")
@@ -249,6 +253,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("City of arrival")
                 .HasColumnName("arrival_city");
             entity.Property(e => e.DepartureAirport)
+                .HasConversion(new StringBackedDataConverter<IataAirportCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Deprature airport code")
@@ -263,6 +268,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Flight ID")
                 .HasColumnName("flight_id");
             entity.Property(e => e.FlightNo)
+                .HasConversion(new StringBackedDataConverter<FlightNo>())
                 .HasMaxLength(6)
                 .IsFixedLength()
                 .HasComment("Flight number")
@@ -285,6 +291,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Scheduled flight duration")
                 .HasColumnName("scheduled_duration");
             entity.Property(e => e.Status)
+                .HasConversion(new FlightStatusConverter())
                 .HasMaxLength(20)
                 .HasComment("Flight status")
                 .HasColumnName("status");

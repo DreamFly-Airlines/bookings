@@ -1,5 +1,5 @@
 ﻿using Bookings.Application.Abstractions;
-using Bookings.Domain.Bookings.Entities;
+using Bookings.Application.Bookings.ReadModels.ReadModels;
 
 namespace Bookings.Application.Bookings.Queries;
 
@@ -7,4 +7,4 @@ public record GetMatchingFlightsQuery(
     string DepartureCity, 
     string ArrivalCity, 
     DateTime DepartureDate, 
-    int PassengersCount) : IQuery<IEnumerable<Flight>>;
+    int PassengersCount) : IQuery<List<FlightReadModel>>;

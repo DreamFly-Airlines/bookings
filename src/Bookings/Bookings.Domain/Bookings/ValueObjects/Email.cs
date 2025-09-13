@@ -1,8 +1,9 @@
 ﻿using System.Text.RegularExpressions;
+using Bookings.Domain.Shared.Abstractions;
 
 namespace Bookings.Domain.Bookings.ValueObjects;
 
-public readonly partial struct Email
+public readonly partial struct Email : IStringBackedData<Email>
 {
     private static readonly Regex EmailRegex =
         GetEmailRegex();

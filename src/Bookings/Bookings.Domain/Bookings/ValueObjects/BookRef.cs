@@ -1,6 +1,8 @@
-﻿namespace Bookings.Domain.Bookings.ValueObjects;
+﻿using Bookings.Domain.Shared.Abstractions;
 
-public readonly record struct BookRef
+namespace Bookings.Domain.Bookings.ValueObjects;
+
+public readonly record struct BookRef : IStringBackedData<BookRef>
 {
     private const int BookRefLength = 6;
     private readonly string _value;

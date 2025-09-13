@@ -44,7 +44,7 @@ public partial class BookingsDbContext : DbContext
             entity.ToView("aircrafts", "bookings");
 
             entity.Property(e => e.AircraftCode)
-                .HasConversion(new StringBackedStructConverter<AircraftCode>(AircraftCode.FromString))
+                .HasConversion(new StringBackedDataConverter<AircraftCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")
@@ -63,7 +63,7 @@ public partial class BookingsDbContext : DbContext
             entity.ToView("airports", "bookings");
 
             entity.Property(e => e.AirportCode)
-                .HasConversion(new StringBackedStructConverter<IataAirportCode>(IataAirportCode.FromString))
+                .HasConversion(new StringBackedDataConverter<IataAirportCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Airport code")
@@ -79,7 +79,7 @@ public partial class BookingsDbContext : DbContext
                 .HasConversion(new CoordinatesConverter())
                 .HasColumnName("coordinates");
             entity.Property(e => e.Timezone)
-                .HasConversion(new StringBackedStructConverter<IanaTimezone>(IanaTimezone.FromString))
+                .HasConversion(new StringBackedDataConverter<IanaTimezone>())
                 .HasComment("Airport time zone")
                 .HasColumnName("timezone");
         });
@@ -95,7 +95,7 @@ public partial class BookingsDbContext : DbContext
             entity.HasIndex(e => new { e.FlightId, e.SeatNo }, "boarding_passes_flight_id_seat_no_key").IsUnique();
 
             entity.Property(e => e.TicketNo)
-                .HasConversion(new StringBackedStructConverter<TicketNo>(TicketNo.FromString))
+                .HasConversion(new StringBackedDataConverter<TicketNo>())
                 .HasMaxLength(13)
                 .IsFixedLength()
                 .HasComment("Ticket number")
@@ -125,7 +125,7 @@ public partial class BookingsDbContext : DbContext
             entity.ToTable("bookings", "bookings", tb => tb.HasComment("Bookings"));
 
             entity.Property(e => e.BookRef)
-                .HasConversion(new StringBackedStructConverter<BookRef>(BookRef.FromString))
+                .HasConversion(new StringBackedDataConverter<BookRef>())
                 .HasMaxLength(6)
                 .IsFixedLength()
                 .HasComment("Booking number")
@@ -158,25 +158,25 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Actual departure time")
                 .HasColumnName("actual_departure");
             entity.Property(e => e.AircraftCode)
-                .HasConversion(new StringBackedStructConverter<AircraftCode>(AircraftCode.FromString))
+                .HasConversion(new StringBackedDataConverter<AircraftCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")
                 .HasColumnName("aircraft_code");
             entity.Property(e => e.ArrivalAirport)
-                .HasConversion(new StringBackedStructConverter<IataAirportCode>(IataAirportCode.FromString))
+                .HasConversion(new StringBackedDataConverter<IataAirportCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Airport of arrival")
                 .HasColumnName("arrival_airport");
             entity.Property(e => e.DepartureAirport)
-                .HasConversion(new StringBackedStructConverter<IataAirportCode>(IataAirportCode.FromString))
+                .HasConversion(new StringBackedDataConverter<IataAirportCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Airport of departure")
                 .HasColumnName("departure_airport");
             entity.Property(e => e.FlightNo)
-                .HasConversion(new StringBackedStructConverter<FlightNo>(FlightNo.FromString))
+                .HasConversion(new StringBackedDataConverter<FlightNo>())
                 .HasMaxLength(6)
                 .IsFixedLength()
                 .HasComment("Flight number")
@@ -297,13 +297,13 @@ public partial class BookingsDbContext : DbContext
                 .ToView("routes", "bookings");
 
             entity.Property(e => e.AircraftCode)
-                .HasConversion(new StringBackedStructConverter<AircraftCode>(AircraftCode.FromString))
+                .HasConversion(new StringBackedDataConverter<AircraftCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")
                 .HasColumnName("aircraft_code");
             entity.Property(e => e.ArrivalAirport)
-                .HasConversion(new StringBackedStructConverter<IataAirportCode>(IataAirportCode.FromString))
+                .HasConversion(new StringBackedDataConverter<IataAirportCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Code of airport of arrival")
@@ -315,11 +315,11 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("City of arrival")
                 .HasColumnName("arrival_city");
             entity.Property(e => e.DaysOfWeek)
-                .HasConversion(new WeekDayArrayConverter())
+                .HasConversion(new WeekDayListConverter())
                 .HasComment("Days of week on which flights are scheduled")
                 .HasColumnName("days_of_week");
             entity.Property(e => e.DepartureAirport)
-                .HasConversion(new StringBackedStructConverter<IataAirportCode>(IataAirportCode.FromString))
+                .HasConversion(new StringBackedDataConverter<IataAirportCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Code of airport of departure")
@@ -334,7 +334,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Scheduled duration of flight")
                 .HasColumnName("duration");
             entity.Property(e => e.FlightNo)
-                .HasConversion(new StringBackedStructConverter<FlightNo>(FlightNo.FromString))
+                .HasConversion(new StringBackedDataConverter<FlightNo>())
                 .HasMaxLength(6)
                 .IsFixedLength()
                 .HasComment("Flight number")
@@ -348,7 +348,7 @@ public partial class BookingsDbContext : DbContext
             entity.ToTable("seats", "bookings", tb => tb.HasComment("Seats"));
 
             entity.Property(e => e.AircraftCode)
-                .HasConversion(new StringBackedStructConverter<AircraftCode>(AircraftCode.FromString))
+                .HasConversion(new StringBackedDataConverter<AircraftCode>())
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .HasComment("Aircraft code, IATA")
@@ -375,13 +375,13 @@ public partial class BookingsDbContext : DbContext
             entity.ToTable("tickets", "bookings", tb => tb.HasComment("Tickets"));
 
             entity.Property(e => e.TicketNo)
-                .HasConversion(new StringBackedStructConverter<TicketNo>(TicketNo.FromString))
+                .HasConversion(new StringBackedDataConverter<TicketNo>())
                 .HasMaxLength(13)
                 .IsFixedLength()
                 .HasComment("Ticket number")
                 .HasColumnName("ticket_no");
             entity.Property(e => e.BookRef)
-                .HasConversion(new StringBackedStructConverter<BookRef>(BookRef.FromString))
+                .HasConversion(new StringBackedDataConverter<BookRef>())
                 .HasMaxLength(6)
                 .IsFixedLength()
                 .HasComment("Booking number")
@@ -412,7 +412,7 @@ public partial class BookingsDbContext : DbContext
             entity.ToTable("ticket_flights", "bookings", tb => tb.HasComment("Flight segment"));
 
             entity.Property(e => e.TicketNo)
-                .HasConversion(new StringBackedStructConverter<TicketNo>(TicketNo.FromString))
+                .HasConversion(new StringBackedDataConverter<TicketNo>())
                 .HasMaxLength(13)
                 .IsFixedLength()
                 .HasComment("Ticket number")

@@ -1,6 +1,8 @@
-﻿namespace Bookings.Domain.Bookings.ValueObjects;
+﻿using Bookings.Domain.Shared.Abstractions;
 
-public struct PhoneNumber
+namespace Bookings.Domain.Bookings.ValueObjects;
+
+public readonly record struct PhoneNumber : IStringBackedData<PhoneNumber>
 {
     private const int PhoneNumberLength = 10;
     private readonly string _value;

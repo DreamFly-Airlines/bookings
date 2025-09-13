@@ -1,6 +1,8 @@
-﻿namespace Bookings.Domain.Bookings.ValueObjects;
+﻿using Bookings.Domain.Shared.Abstractions;
 
-public readonly record struct FlightNo
+namespace Bookings.Domain.Bookings.ValueObjects;
+
+public readonly record struct FlightNo : IStringBackedData<FlightNo>
 {
     private const int FlightNoLength = 6;
     private readonly string _value;

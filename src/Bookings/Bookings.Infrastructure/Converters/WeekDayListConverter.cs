@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Bookings.Infrastructure.Converters;
 
-public class WeekDayArrayConverter() : ValueConverter<List<WeekDay>, string[]>(
+public class WeekDayListConverter() : ValueConverter<List<WeekDay>, string[]>(
     enumDays => enumDays.Select(ConvertToString).ToArray(), 
     stringDays => stringDays.Select(ConvertToWeekDay).ToList())
 {

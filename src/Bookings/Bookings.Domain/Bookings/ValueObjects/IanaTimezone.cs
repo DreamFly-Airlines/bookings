@@ -1,6 +1,8 @@
-﻿namespace Bookings.Domain.Bookings.ValueObjects;
+﻿using Bookings.Domain.Shared.Abstractions;
 
-public readonly record struct IanaTimezone
+namespace Bookings.Domain.Bookings.ValueObjects;
+
+public readonly record struct IanaTimezone : IStringBackedData<IanaTimezone>
 {
     private readonly string _value;
     

@@ -10,5 +10,7 @@ public class SqlFlightReadModelRepository(BookingsDbContext dbContext) : IFlight
 {
     public async Task<List<FlightReadModel>> Where(
         Expression<Func<FlightReadModel, bool>> filter, CancellationToken cancellationToken = default)
-        => await dbContext.FlightsView.Where(filter).ToListAsync(cancellationToken: cancellationToken);
+        => await dbContext.FlightsView
+            .Where(filter)
+            .ToListAsync(cancellationToken);
 }

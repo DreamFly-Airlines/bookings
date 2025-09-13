@@ -11,12 +11,24 @@ using Microsoft.AspNetCore.Localization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddNpgsql<BookingsDbContext>(builder.Configuration.GetConnectionString("BookingsDb"));
+
 builder.Services.AddScoped<IQuerySender, ServiceProviderQuerySender>();
 builder.Services.AddScoped<IFlightReadModelRepository, SqlFlightReadModelRepository>();
+
 builder.Services.AddQueryHandlers(typeof(GetMatchingFlightsQueryHandler).Assembly);
+
+builder.Services.AddEndpointsApiExplorer(); 
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 app.MapControllers();

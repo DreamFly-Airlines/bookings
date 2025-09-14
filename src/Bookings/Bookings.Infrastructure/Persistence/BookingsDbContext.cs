@@ -1,5 +1,6 @@
 ﻿using Bookings.Application.Bookings.ReadModels;
 using Bookings.Application.Bookings.ReadModels.ReadModels;
+using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Infrastructure.Converters;
@@ -406,7 +407,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Passenger name")
                 .HasColumnName("passenger_name");
             entity.HasOne<Booking>()
-                .WithMany()
+                .WithMany(b => b.Tickets)
                 .HasForeignKey(d => d.BookRef)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("tickets_book_ref_fkey");

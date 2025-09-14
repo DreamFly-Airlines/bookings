@@ -6,6 +6,6 @@ public class BookFlightCommandHandler : ICommandHandler<BookFlightCommand>
 {
     public async Task HandleAsync(BookFlightCommand command, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var booking = new Bookings
     }
 }

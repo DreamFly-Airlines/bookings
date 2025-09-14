@@ -1,8 +1,6 @@
 ﻿using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.ReadModels.ReadModels;
-using Bookings.Application.Bookings.ReadModels.Repositories;
 using Bookings.Application.Services;
-using Bookings.Domain.Bookings.Enums;
 namespace Bookings.Application.Bookings.Queries;
 
 public class SearchMatchingFlightsQueryHandler(

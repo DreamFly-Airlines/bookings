@@ -1,19 +1,17 @@
-using System.Globalization;
 using Bookings.Api.Extensions;
 using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Queries;
-using Bookings.Application.Bookings.ReadModels.Repositories;
+using Bookings.Application.Services;
+using Bookings.Infrastructure;
 using Bookings.Infrastructure.Persistence;
 using Bookings.Infrastructure.Queries;
-using Bookings.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddNpgsql<BookingsDbContext>(builder.Configuration.GetConnectionString("BookingsDb"));
 
 builder.Services.AddScoped<IQuerySender, ServiceProviderQuerySender>();
-builder.Services.AddScoped<IFlightReadModelRepository, SqlFlightReadModelRepository>();
+builder.Services.AddScoped<IFlightSearchingService, SqlFlightSearchingService>();
 
 builder.Services.AddQueryHandlers(typeof(SearchMatchingFlightsQueryHandler).Assembly);
 

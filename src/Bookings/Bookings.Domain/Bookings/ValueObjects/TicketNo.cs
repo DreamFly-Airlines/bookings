@@ -4,7 +4,7 @@ namespace Bookings.Domain.Bookings.ValueObjects;
 
 public readonly record struct TicketNo : IStringBackedData<TicketNo>
 {
-    private const int TicketNoLength = 13;
+    public const int TicketNoLength = 13;
     private readonly string _value;
     
     private TicketNo(string value) => _value = value;

@@ -4,7 +4,7 @@ namespace Bookings.Domain.Bookings.ValueObjects;
 
 public readonly record struct BookRef : IStringBackedData<BookRef>
 {
-    private const int BookRefLength = 6;
+    public const int BookRefLength = 6;
     private readonly string _value;
     
     private BookRef(string value) => _value = value;

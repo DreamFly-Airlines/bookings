@@ -1,11 +1,16 @@
 ﻿using Bookings.Application.Abstractions;
+using Bookings.Application.Services;
+using Bookings.Domain.Bookings.AggregateRoots;
+using Bookings.Domain.Bookings.ValueObjects;
 
 namespace Bookings.Application.Bookings.Commands;
 
-public class BookFlightCommandHandler : ICommandHandler<BookFlightCommand>
+public class BookFlightCommandHandler(
+    IStringBackedDataGeneratorService generator) : ICommandHandler<MakeBookingCommand>
 {
-    public async Task HandleAsync(BookFlightCommand command, CancellationToken cancellationToken = default)
+    public async Task HandleAsync(MakeBookingCommand command, CancellationToken cancellationToken = default)
     {
-        var booking = new Bookings
+        throw new NotImplementedException();
+        
     }
 }

@@ -1,7 +1,7 @@
 using Bookings.Api.Extensions;
 using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Queries;
-using Bookings.Application.Services;
+using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Infrastructure;
 using Bookings.Infrastructure.Persistence;

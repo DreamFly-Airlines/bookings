@@ -11,9 +11,9 @@ public class Ticket
     public string PassengerId { get; }
     public string PassengerName { get; }
     public ContactData ContactData { get; }
-    public IReadOnlySet<TicketFlight> Flights { get; }
+    public IReadOnlySet<TicketFlight> TicketFlights { get; }
 
-    private HashSet<TicketFlight> _flights;
+    private HashSet<TicketFlight> _ticketFlights;
 
     public Ticket(
         TicketNo ticketNo, 
@@ -32,7 +32,7 @@ public class Ticket
     public void AddFlight(int flightId, FareConditions fareConditions, decimal amount)
     {
         var ticketFlight = new TicketFlight(TicketNo, flightId, fareConditions, amount);
-        if (!_flights.Add(ticketFlight))
+        if (!_ticketFlights.Add(ticketFlight))
             throw new InvalidDomainOperationException(
                 $"{nameof(Flight)} with ID \"{flightId}\" already added to {nameof(Ticket)} " +
                 $"with {nameof(TicketNo)} \"{TicketNo}\".");

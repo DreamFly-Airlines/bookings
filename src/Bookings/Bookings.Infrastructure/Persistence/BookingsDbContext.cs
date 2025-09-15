@@ -442,7 +442,7 @@ public partial class BookingsDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("ticket_flights_flight_id_fkey");
             entity.HasOne<Ticket>()
-                .WithMany()
+                .WithMany(t => t.TicketFlights)
                 .HasForeignKey(d => d.TicketNo)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("ticket_flights_ticket_no_fkey");

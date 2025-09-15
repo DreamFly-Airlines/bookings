@@ -1,6 +1,7 @@
 ﻿using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.ReadModels.ReadModels;
-using Bookings.Application.Services;
+using Bookings.Application.Bookings.Services;
+
 namespace Bookings.Application.Bookings.Queries;
 
 public class SearchMatchingFlightsQueryHandler(

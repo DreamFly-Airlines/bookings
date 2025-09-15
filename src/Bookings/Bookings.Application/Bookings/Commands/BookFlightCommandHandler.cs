@@ -1,5 +1,5 @@
 ﻿using Bookings.Application.Abstractions;
-using Bookings.Application.Services;
+using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;

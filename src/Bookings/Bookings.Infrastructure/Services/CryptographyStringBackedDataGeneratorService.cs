@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using Bookings.Application.Services;
+using Bookings.Application.Bookings.Services;
 
 namespace Bookings.Infrastructure.Services;
 

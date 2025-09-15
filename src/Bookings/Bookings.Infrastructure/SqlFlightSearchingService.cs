@@ -1,5 +1,5 @@
 ﻿using Bookings.Application.Bookings.ReadModels.ReadModels;
-using Bookings.Application.Services;
+using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.Enums;
 using Bookings.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;

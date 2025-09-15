@@ -1,4 +1,4 @@
-﻿namespace Bookings.Application.Services;
+﻿namespace Bookings.Application.Bookings.Services;
 
 public interface IStringBackedDataGeneratorService
 {

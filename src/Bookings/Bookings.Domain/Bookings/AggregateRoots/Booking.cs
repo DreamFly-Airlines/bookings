@@ -24,22 +24,20 @@ public class Booking : AggregateRoot<IDomainEvent>
         IEnumerable<(
             TicketNo TicketNo, 
             decimal TicketCost, 
-            string PassengerId, 
-            string PassengerName, 
-            ContactData ContactData)> ticketsInfo)
+            Passenger Passenger)> passengersTicketsInfo)
     {
         BookRef = bookRef;
         BookDate = bookDate;
         TotalAmount = 0;
         _tickets = [];
-        foreach (var ticketInfo in ticketsInfo)
+        foreach (var ticketInfo in passengersTicketsInfo)
         {
             var ticket = new Ticket(
                 ticketInfo.TicketNo, 
                 BookRef, 
-                ticketInfo.PassengerId, 
-                ticketInfo.PassengerName, 
-                ticketInfo.ContactData);
+                ticketInfo.Passenger.PassengerId, 
+                ticketInfo.Passenger.PassengerName, 
+                ticketInfo.Passenger.ContactData);
             AddTicketAndEvaluateTotalAmountOrThrow(ticket, ticketInfo.TicketCost);
             foreach (var flightId in flightsIdsForTicket)
                 ticket.AddFlight(flightId, fareConditions, ticketInfo.TicketCost);

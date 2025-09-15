@@ -1,6 +1,7 @@
 ﻿using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.AggregateRoots;
+using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
 
@@ -25,9 +26,8 @@ public class MakeBookingCommandHandler(
             return (
                 TicketNo: ticketNo, 
                 TicketCost: ticketCost, 
-                passengerInfo.PassengerId, 
-                passengerInfo.PassengerName, 
-                passengerInfo.ContactData);
+                Passenger: new Passenger(
+                    passengerInfo.PassengerId, passengerInfo.PassengerName, passengerInfo.ContactData));
         });
         var bookDate = await clockService.NowAsync(cancellationToken);
         var booking = new Booking(

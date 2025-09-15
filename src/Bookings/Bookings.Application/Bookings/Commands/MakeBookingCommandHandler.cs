@@ -6,7 +6,8 @@ using Bookings.Domain.Bookings.ValueObjects;
 
 namespace Bookings.Application.Bookings.Commands;
 
-public class BookFlightCommandHandler(
+public class MakeBookingCommandHandler(
+    IClockService clockService,
     IBookingRepository bookingRepository,
     IStringBackedDataGeneratorService generator) : ICommandHandler<MakeBookingCommand>
 {
@@ -26,8 +27,13 @@ public class BookFlightCommandHandler(
                 passengerInfo.PassengerName, 
                 passengerInfo.ContactData);
         });
-        var bookDate = DateTime.UtcNow; // TODO: use bookings.now();
-        var booking = new Booking(bookRef, bookDate, command.FareConditions, command.FlightsIds, ticketsInfo);
+        var bookDate = await clockService.NowAsync(cancellationToken);
+        var booking = new Booking(
+            bookRef, 
+            bookDate, 
+            command.FareConditions, 
+            command.FlightsIds, 
+            ticketsInfo);
         await bookingRepository.AddAsync(booking, cancellationToken);
     }
 }

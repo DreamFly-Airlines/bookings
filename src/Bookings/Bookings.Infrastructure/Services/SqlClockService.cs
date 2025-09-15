@@ -1,0 +1,23 @@
+﻿using Bookings.Application.Bookings.Services;
+using Bookings.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+
+namespace Bookings.Infrastructure.Services;
+
+// TODO: think about performance
+public class SqlClockService(BookingsDbContext bookingsDbContext) : IClockService
+{
+    private const string BookingsNowFunction = "bookings.now()";
+    
+    public async Task<DateTime> NowAsync(CancellationToken cancellationToken = default)
+    {
+        await using var connection = bookingsDbContext.Database.GetDbConnection();
+        await connection.OpenAsync(cancellationToken);
+        await using var command = connection.CreateCommand();
+        command.CommandText = $"select {BookingsNowFunction};";
+        var funcResult = await command.ExecuteScalarAsync(cancellationToken);
+        if (funcResult is null)
+            throw new NullReferenceException($"{BookingsNowFunction} returned null.");
+        return (DateTime)funcResult;
+    }
+}

@@ -15,7 +15,7 @@ public class FlightsController(
     [HttpGet("search")]
     public async Task<IActionResult> FindMatchingFlights([FromQuery] FlightsSearchDto dto)
     {
-        var query = new SearchMatchingFlightsQuery(
+        var query = new SearchFlightsItineraryQuery(
             dto.DepartureCity, 
             dto.ArrivalCity, 
             dto.DepartureDate, 

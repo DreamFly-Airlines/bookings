@@ -7,6 +7,7 @@ using Bookings.Domain.Bookings.ValueObjects;
 namespace Bookings.Application.Bookings.Commands;
 
 public class MakeBookingCommandHandler(
+    IItineraryPricingService pricingService,
     IClockService clockService,
     IBookingRepository bookingRepository,
     IStringBackedDataGeneratorService generator) : ICommandHandler<MakeBookingCommand>
@@ -15,8 +16,10 @@ public class MakeBookingCommandHandler(
     {
         var bookRef = BookRef.FromString(
             generator.Generate(BookRef.BookRefLength, true, true));
-        const decimal ticketCost = 1000; // TODO: calculate tickets costs
-        var ticketsInfo = command.PassengersInfos.Select(passengerInfo =>
+        var ticketCost = await pricingService.CalculatePriceAsync(
+            command.ItineraryFlightsIds, command.FareConditions, cancellationToken);
+        var ticketsInfo = command.PassengersInfos
+            .Select(passengerInfo =>
         {
             var ticketNo = TicketNo.FromString(
                 generator.Generate(TicketNo.TicketNoLength, true, false));
@@ -32,7 +35,7 @@ public class MakeBookingCommandHandler(
             bookRef, 
             bookDate, 
             command.FareConditions, 
-            command.FlightsIds, 
+            command.ItineraryFlightsIds, 
             ticketsInfo);
         await bookingRepository.AddAsync(booking, cancellationToken);
     }

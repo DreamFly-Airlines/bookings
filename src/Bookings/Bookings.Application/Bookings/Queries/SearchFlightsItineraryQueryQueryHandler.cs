@@ -4,12 +4,12 @@ using Bookings.Application.Bookings.Services;
 
 namespace Bookings.Application.Bookings.Queries;
 
-public class SearchMatchingFlightsQueryHandler(
+public class SearchFlightsItineraryQueryQueryHandler(
     IFlightSearchingService flightSearchingService) 
-    : IQueryHandler<SearchMatchingFlightsQuery, List<FlightReadModel>>
+    : IQueryHandler<SearchFlightsItineraryQuery, List<FlightReadModel>>
 {
     public async Task<List<FlightReadModel>> HandleAsync(
-        SearchMatchingFlightsQuery query, CancellationToken cancellationToken = default)
+        SearchFlightsItineraryQuery query, CancellationToken cancellationToken = default)
     {
         return await flightSearchingService.SearchAsync(
             query.DepartureCity,

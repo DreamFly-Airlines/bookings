@@ -18,7 +18,7 @@ builder.Services.AddScoped<IFlightSearchingService, SqlFlightSearchingService>()
 builder.Services.AddScoped<IBookingRepository, SqlBookingRepository>();
 builder.Services.AddSingleton<IStringBackedDataGeneratorService, CryptographyStringBackedDataGeneratorService>();
 
-builder.Services.AddQueryHandlers(typeof(SearchMatchingFlightsQueryHandler).Assembly);
+builder.Services.AddQueryHandlers(typeof(SearchFlightsItineraryQueryQueryHandler).Assembly);
 
 builder.Services.AddEndpointsApiExplorer(); 
 builder.Services.AddSwaggerGen();

@@ -24,10 +24,11 @@ public class FlightsController(
         return Ok(flights);
     }
 
-    [HttpPost("book/{flightId}")]
-    public async Task<IActionResult> MakeBooking(List<int> flightsIds, [FromBody] BookingRequestDto request)
+    [HttpPost("book")]
+    public async Task<IActionResult> MakeBooking([FromBody] BookingRequestDto request)
     {
-        var bookCommand = new MakeBookingCommand(flightsIds, request.PassengersInfos, request.FareConditions);
+        var bookCommand = new MakeBookingCommand(
+            request.ItineraryFlightsIds, request.PassengersInfos, request.FareConditions);
         await commandSender.SendAsync(bookCommand);
         return Ok();
     }

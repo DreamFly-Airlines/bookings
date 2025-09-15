@@ -14,8 +14,7 @@ public class MakeBookingCommandHandler(
 {
     public async Task HandleAsync(MakeBookingCommand command, CancellationToken cancellationToken = default)
     {
-        var bookRef = BookRef.FromString(
-            generator.Generate(BookRef.BookRefLength, true, true));
+        var bookRef = BookRef.FromString(generator.Generate(BookRef.BookRefLength, true, true));
         var ticketCost = await pricingService.CalculatePriceAsync(
             command.ItineraryFlightsIds, command.FareConditions, cancellationToken);
         var ticketsInfo = command.PassengersInfos

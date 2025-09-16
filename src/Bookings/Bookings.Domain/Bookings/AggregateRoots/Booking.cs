@@ -1,4 +1,5 @@
-﻿using Bookings.Domain.Bookings.Entities;
+﻿using System.ComponentModel;
+using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.Enums;
 using Bookings.Domain.Bookings.Events;
 using Bookings.Domain.Bookings.ValueObjects;
@@ -54,4 +55,11 @@ public class Booking : AggregateRoot<IDomainEvent>
                 $"A {nameof(Booking)} with {nameof(BookRef)} \"{BookRef}\" " +
                 $"already has a {nameof(Ticket)} with {nameof(ticketNo)} \"{ticketNo}\".");
     }
+    
+    // NOTE: consider removing this infrastructure detail
+    [Obsolete("Used only by Entity Framework. Do not use it directly.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private Booking() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 }

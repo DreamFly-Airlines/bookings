@@ -10,26 +10,17 @@ public static class ServiceCollectionExtensions
         Assembly assembly)
     {
         var handlerInterfaceType = typeof(IQueryHandler<,>);
-
-        var types = assembly
-            .GetTypes()
-            .Where(t => t is { IsAbstract: false, IsInterface: false })
-            .Select(t => new
-            {
-                Implementation = t,
-                Interfaces = t.GetInterfaces()
-                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == handlerInterfaceType)
-            });
-
-        foreach (var type in types)
-            foreach (var itf in type.Interfaces)
-                services.AddScoped(itf, type.Implementation);
+        services.FindImplementationsAndRegister(handlerInterfaceType, assembly);
     }
 
     public static void AddCommandHandlers(this IServiceCollection services, Assembly assembly)
     {
         var handlerInterfaceType = typeof(ICommandHandler<>);
+        services.FindImplementationsAndRegister(handlerInterfaceType, assembly);
+    }
 
+    private static void FindImplementationsAndRegister(this IServiceCollection services, Type interfaceType, Assembly assembly)
+    {
         var types = assembly
             .GetTypes()
             .Where(t => t is { IsAbstract: false, IsInterface: false })
@@ -37,11 +28,11 @@ public static class ServiceCollectionExtensions
             {
                 Implementation = t,
                 Interfaces = t.GetInterfaces()
-                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == handlerInterfaceType)
+                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceType)
             });
 
         foreach (var type in types)
-        foreach (var itf in type.Interfaces)
-            services.AddScoped(itf, type.Implementation);
+            foreach (var @interface in type.Interfaces)
+                services.AddScoped(@interface, type.Implementation);
     }
 }

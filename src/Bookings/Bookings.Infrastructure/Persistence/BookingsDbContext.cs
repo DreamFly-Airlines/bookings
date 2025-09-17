@@ -5,6 +5,7 @@ using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Infrastructure.Converters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace Bookings.Infrastructure.Persistence;
 
@@ -38,6 +39,17 @@ public partial class BookingsDbContext : DbContext
     public virtual DbSet<Ticket> Tickets { get; set; }
 
     public virtual DbSet<TicketFlight> TicketFlights { get; set; }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // NOTE: ForeignKeyIndexConvention creates indexes that do not exist in the bookings schema
+        // for the file "demo-big.zip 2018-01-11 22:28 232M" on https://edu.postgrespro.ru/, these are
+        // flights.aircraft_code, flights.arrival_airport, flights.departure_airport,
+        // tickets.book_ref, ticket_flights.flight_id
+        
+        configurationBuilder.Conventions.Remove<ForeignKeyIndexConvention>();
+        base.ConfigureConventions(configurationBuilder);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

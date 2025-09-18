@@ -4,11 +4,13 @@ using Bookings.Application.Bookings.Commands;
 using Bookings.Application.Bookings.Queries;
 using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.Repositories;
+using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Infrastructure;
 using Bookings.Infrastructure.Commands;
 using Bookings.Infrastructure.Persistence;
 using Bookings.Infrastructure.Queries;
 using Bookings.Infrastructure.Repositories;
+using Bookings.Infrastructure.Serialization;
 using Bookings.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,7 +31,11 @@ builder.Services.AddCommandHandlers(typeof(MakeBookingCommandHandler).Assembly);
 builder.Services.AddEndpointsApiExplorer(); 
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+    {
+        opts.JsonSerializerOptions.Converters.Add(new StringBackedDataJsonConverterFactory());
+    });
 
 var app = builder.Build();
 

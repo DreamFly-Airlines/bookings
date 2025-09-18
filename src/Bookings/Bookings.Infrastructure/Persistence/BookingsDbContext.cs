@@ -222,6 +222,13 @@ public partial class BookingsDbContext : DbContext
                 .HasForeignKey(d => d.DepartureAirport)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("flights_departure_airport_fkey");
+
+            entity.HasIndex(f => f.ScheduledDeparture)
+                .HasFilter("status in ('Scheduled', 'On time')")
+                .HasDatabaseName("flights_scheduled_departure_with_status_cond_idx");
+            entity.HasIndex(f => f.ActualDeparture)
+                .HasFilter("status = 'Delayed'")
+                .HasDatabaseName("flights_actual_departure_with_status_cond_idx");
         });
 
         modelBuilder.Entity<FlightReadModel>(entity =>
@@ -458,6 +465,9 @@ public partial class BookingsDbContext : DbContext
                 .HasForeignKey(d => d.TicketNo)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("ticket_flights_ticket_no_fkey");
+            
+            entity.HasIndex(tf => tf.FlightId)
+                .HasDatabaseName("ticket_flights_flight_id_idx");
         });
 
         OnModelCreatingPartial(modelBuilder);

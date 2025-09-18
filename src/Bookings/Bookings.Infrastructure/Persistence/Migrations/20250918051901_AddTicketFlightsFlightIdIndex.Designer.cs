@@ -3,6 +3,7 @@ using System;
 using Bookings.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
@@ -12,9 +13,11 @@ using NpgsqlTypes;
 namespace Bookings.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(BookingsDbContext))]
-    partial class BookingsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250918051901_AddTicketFlightsFlightIdIndex")]
+    partial class AddTicketFlightsFlightIdIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -354,14 +357,6 @@ namespace Bookings.Infrastructure.Persistence.Migrations
 
                     b.HasKey("FlightId")
                         .HasName("flights_pkey");
-
-                    b.HasIndex("ActualDeparture")
-                        .HasDatabaseName("flights_actual_departure_with_status_cond_idx")
-                        .HasFilter("status = 'Delayed'");
-
-                    b.HasIndex("ScheduledDeparture")
-                        .HasDatabaseName("flights_scheduled_departure_with_status_cond_idx")
-                        .HasFilter("status in ('Scheduled', 'On time')");
 
                     b.HasIndex(new[] { "FlightNo", "ScheduledDeparture" }, "flights_flight_no_scheduled_departure_key")
                         .IsUnique();

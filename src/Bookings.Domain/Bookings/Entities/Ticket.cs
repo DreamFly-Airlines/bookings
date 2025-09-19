@@ -11,9 +11,9 @@ public class Ticket
     public string PassengerId { get; }
     public string PassengerName { get; }
     public ContactData ContactData { get; }
-    public IReadOnlySet<TicketFlight> TicketFlights { get; }
+    public IReadOnlySet<TicketFlight> TicketFlights => _ticketFlights;
 
-    private HashSet<TicketFlight> _ticketFlights;
+    private readonly HashSet<TicketFlight> _ticketFlights;
 
     public Ticket(
         TicketNo ticketNo, 
@@ -27,6 +27,7 @@ public class Ticket
         PassengerId = passengerId;
         PassengerName = passengerName;
         ContactData = contactData;
+        _ticketFlights = [];
     }
 
     public void AddFlight(int flightId, FareConditions fareConditions, decimal amount)

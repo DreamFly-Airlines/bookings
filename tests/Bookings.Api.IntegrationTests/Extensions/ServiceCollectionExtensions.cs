@@ -11,6 +11,14 @@ public static class ServiceCollectionExtensions
         serviceCollection.RemoveServiceDescriptorIfExists<TInterface>();
         serviceCollection.AddSingleton<TInterface, TImplementation>();
     }
+    
+    public static void ReplaceScopedService<TInterface, TImplementation>(this IServiceCollection serviceCollection) 
+        where TInterface : class
+        where TImplementation : class, TInterface
+    {
+        serviceCollection.RemoveServiceDescriptorIfExists<TInterface>();
+        serviceCollection.AddScoped<TInterface, TImplementation>();
+    }
 
     public static void RemoveServiceDescriptorIfExists<T>(this IServiceCollection serviceCollection)
     {

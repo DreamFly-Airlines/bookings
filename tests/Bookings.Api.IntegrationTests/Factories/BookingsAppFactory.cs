@@ -2,6 +2,7 @@
 using Bookings.Api.IntegrationTests.Mocks;
 using Bookings.Application.Bookings.Services;
 using Bookings.Infrastructure.Persistence;
+using Bookings.Infrastructure.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +22,11 @@ public class BookingsAppFactory : WebApplicationFactory<Program>
             services.RemoveServiceDescriptorIfExists<BookingsDbContext>();
             services.AddNpgsql<BookingsDbContext>(
                 "Host=localhost;Port=5432;Database=DreamFly;Username=postgres;Password=postgres");
+            
             services.ReplaceSingletonService<IStringBackedDataGeneratorService, 
                 MockConstStringBackedDataGeneratorService>();
+            services.ReplaceScopedService<IItineraryPricingService, 
+                MockConstItineraryPricingService>();
         });
         base.ConfigureWebHost(builder);
     }

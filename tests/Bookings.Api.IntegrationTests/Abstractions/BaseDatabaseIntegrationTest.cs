@@ -14,7 +14,7 @@ public abstract class BaseDatabaseIntegrationTest : IClassFixture<BookingsAppFac
     protected HttpClient Client { get; }
     protected BookingsDbContext DbContext { get; }
 
-    internal BaseDatabaseIntegrationTest(BookingsAppFactory factory)
+    protected BaseDatabaseIntegrationTest(BookingsAppFactory factory)
     {
         _scope = factory.Services.CreateScope();
         Client = factory.CreateClient();

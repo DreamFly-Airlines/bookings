@@ -4,7 +4,12 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Bookings.Api.IntegrationTests;
 
-public class FlightsControllerTest : BaseDatabaseIntegrationTest
+public class FlightsControllerTest(BookingsAppFactory factory) : BaseDatabaseIntegrationTest(factory)
 {
-    internal FlightsControllerTest(BookingsAppFactory factory) : base(factory) { }
+    [Fact]
+    public void TestHost_Builds_Successfully()
+    {
+        Assert.NotNull(Client);
+        Assert.NotNull(DbContext);
+    }
 }

@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Bookings.Api.IntegrationTests.Factories;
 
-internal class BookingsAppFactory : WebApplicationFactory<Program>
+public class BookingsAppFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

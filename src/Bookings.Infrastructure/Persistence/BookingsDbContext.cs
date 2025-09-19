@@ -452,6 +452,7 @@ public partial class BookingsDbContext : DbContext
                 .HasComment("Travel cost")
                 .HasColumnName("amount");
             entity.Property(e => e.FareConditions)
+                .HasConversion(new  FareConditionsConverter())
                 .HasMaxLength(10)
                 .HasComment("Travel class")
                 .HasColumnName("fare_conditions");

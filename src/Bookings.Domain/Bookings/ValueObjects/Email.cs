@@ -24,8 +24,8 @@ public readonly partial struct Email : IStringBackedData<Email>
     public override string ToString() => _value;
     
     [GeneratedRegex("""
-                    /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@
-                    (?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
+                    ^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@
+                    (?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$
                     """, RegexOptions.IgnorePatternWhitespace)]
     private static partial Regex GetEmailRegex();
 }

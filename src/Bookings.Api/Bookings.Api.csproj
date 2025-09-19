@@ -22,5 +22,9 @@
       <ProjectReference Include="..\Bookings.Application\Bookings.Application.csproj" />
       <ProjectReference Include="..\Bookings.Infrastructure\Bookings.Infrastructure.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <InternalsVisibleTo Include="Bookings.Api.IntegrationTests" />
+    </ItemGroup>
 
 </Project>

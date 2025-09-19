@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bookings.Domain", "src\Book
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bookings.Infrastructure", "src\Bookings.Infrastructure\Bookings.Infrastructure.csproj", "{FCB624F0-D23A-461B-88A2-4DD99B1F9621}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bookings.Api.IntegrationTests", "tests\Bookings.Api.IntegrationTests\Bookings.Api.IntegrationTests.csproj", "{656316E8-6870-4E49-AA01-8FAE9F2245EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{FCB624F0-D23A-461B-88A2-4DD99B1F9621}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCB624F0-D23A-461B-88A2-4DD99B1F9621}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCB624F0-D23A-461B-88A2-4DD99B1F9621}.Release|Any CPU.Build.0 = Release|Any CPU
+		{656316E8-6870-4E49-AA01-8FAE9F2245EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{656316E8-6870-4E49-AA01-8FAE9F2245EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{656316E8-6870-4E49-AA01-8FAE9F2245EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{656316E8-6870-4E49-AA01-8FAE9F2245EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

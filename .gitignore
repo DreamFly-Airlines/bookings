@@ -55,3 +55,6 @@ nunit-*.xml
 
 # Rider Ide
 .idea/
+
+# JetBrains Rider / ReSharper user-specific settings
+*.sln.DotSettings.user

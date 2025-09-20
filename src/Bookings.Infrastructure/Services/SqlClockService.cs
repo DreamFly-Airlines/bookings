@@ -1,4 +1,5 @@
-﻿using Bookings.Application.Bookings.Services;
+﻿using System.Data;
+using Bookings.Application.Bookings.Services;
 using Bookings.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,12 +13,18 @@ public class SqlClockService(BookingsDbContext bookingsDbContext) : IClockServic
     public async Task<DateTime> NowAsync(CancellationToken cancellationToken = default)
     {
         var connection = bookingsDbContext.Database.GetDbConnection();
-        await connection.OpenAsync(cancellationToken);
+        var wasClosed = connection.State == ConnectionState.Closed;
+
+        if (wasClosed)
+            await connection.OpenAsync(cancellationToken);
         await using var command = connection.CreateCommand();
         command.CommandText = $"select {BookingsNowFunction};";
         var funcResult = await command.ExecuteScalarAsync(cancellationToken);
         if (funcResult is null)
             throw new NullReferenceException($"{BookingsNowFunction} returned null.");
+        
+        if (wasClosed)
+            await connection.CloseAsync();
         return (DateTime)funcResult;
     }
 }

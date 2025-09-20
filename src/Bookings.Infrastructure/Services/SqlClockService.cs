@@ -11,7 +11,7 @@ public class SqlClockService(BookingsDbContext bookingsDbContext) : IClockServic
     
     public async Task<DateTime> NowAsync(CancellationToken cancellationToken = default)
     {
-        await using var connection = bookingsDbContext.Database.GetDbConnection();
+        var connection = bookingsDbContext.Database.GetDbConnection();
         await connection.OpenAsync(cancellationToken);
         await using var command = connection.CreateCommand();
         command.CommandText = $"select {BookingsNowFunction};";

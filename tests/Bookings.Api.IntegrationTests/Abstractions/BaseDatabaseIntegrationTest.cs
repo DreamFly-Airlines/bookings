@@ -1,4 +1,5 @@
-﻿using Bookings.Api.IntegrationTests.Factories;
+﻿using System.Data.Common;
+using Bookings.Api.IntegrationTests.Factories;
 using Bookings.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -10,12 +11,14 @@ public abstract class BaseDatabaseIntegrationTest : IClassFixture<BookingsAppFac
 {
     private readonly IServiceScope _scope;
     private IDbContextTransaction? _transaction;
+    private readonly BookingsAppFactory _factory;
     
     protected HttpClient Client { get; }
     protected BookingsDbContext DbContext { get; }
 
     protected BaseDatabaseIntegrationTest(BookingsAppFactory factory)
     {
+        _factory = factory;
         _scope = factory.Services.CreateScope();
         Client = factory.CreateClient();
         DbContext = _scope.ServiceProvider.GetRequiredService<BookingsDbContext>();
@@ -24,6 +27,7 @@ public abstract class BaseDatabaseIntegrationTest : IClassFixture<BookingsAppFac
     public async Task InitializeAsync()
     {
         _transaction = await DbContext.Database.BeginTransactionAsync();
+        _factory.ActiveTransaction = _transaction.GetDbTransaction();
     }
 
     public async Task DisposeAsync()

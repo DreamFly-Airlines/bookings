@@ -3,7 +3,6 @@ using Bookings.Api.IntegrationTests.Extensions;
 using Bookings.Api.IntegrationTests.Mocks;
 using Bookings.Application.Bookings.Services;
 using Bookings.Infrastructure.Persistence;
-using Bookings.Infrastructure.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +13,8 @@ namespace Bookings.Api.IntegrationTests.Factories;
 
 public class BookingsAppFactory : WebApplicationFactory<Program>
 {
+    public DbTransaction? ActiveTransaction { get; set; }
+    
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
@@ -36,10 +37,18 @@ public class BookingsAppFactory : WebApplicationFactory<Program>
                 connection.Open();
                 return connection;
             });
-            services.AddDbContext<BookingsDbContext>((container, options) =>
+            services.AddScoped<BookingsDbContext>(container =>
             {
                 var connection = container.GetRequiredService<DbConnection>();
-                options.UseNpgsql(connection);
+                var options = new DbContextOptionsBuilder<BookingsDbContext>()
+                    .UseNpgsql(connection)
+                    .Options;
+                
+                var dbContext = new BookingsDbContext(options);
+                if (ActiveTransaction is not null)
+                    dbContext.Database.UseTransaction(ActiveTransaction);
+                
+                return dbContext;
             });
             
             services.ReplaceSingletonService<IStringBackedDataGeneratorService, 

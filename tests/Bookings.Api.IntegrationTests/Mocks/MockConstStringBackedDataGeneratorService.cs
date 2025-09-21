@@ -4,8 +4,15 @@ namespace Bookings.Api.IntegrationTests.Mocks;
 
 public class MockConstStringBackedDataGeneratorService : IStringBackedDataGeneratorService
 {
-    private const char ValueToRepeat = '1';
-    
+    private const char NumberToRepeat = '1';
+    private const char CapitalLetterToRepeat = 'A';
+
     public string Generate(int length, bool isNumbersAllowed, bool isCapitalLettersAllowed)
-        => new(Enumerable.Repeat(ValueToRepeat, length).ToArray());
+    {
+        if (isNumbersAllowed)
+            return new(NumberToRepeat, length);
+        if (isCapitalLettersAllowed)
+            return new(CapitalLetterToRepeat, length);
+        throw new InvalidOperationException("At least numbers or capital letters must be allowed.");
+    }
 }

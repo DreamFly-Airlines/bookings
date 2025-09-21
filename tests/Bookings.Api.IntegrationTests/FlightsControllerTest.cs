@@ -24,17 +24,22 @@ public class FlightsControllerTest(BookingsAppFactory factory) : BaseDatabaseInt
     public async Task MakeBooking_FromMoscowToBryansk_CreatesBookingInDatabase()
     {
         const int moscowBryanskFlightId = 19142;
+        const string passengerId = "9999 999999";
+        const string passengerName = "TEST PASSENGER";
+        const string email = "test@test.com";
+        const FareConditions fareConditions = FareConditions.Economy;
+        
         var moscowBryanskFlight = await DbContext.Flights
             .FirstOrDefaultAsync(f => f.FlightId == moscowBryanskFlightId);
         Assert.NotNull(moscowBryanskFlight);
         
-        var passengerInfo = new PassengerInfoDto("9999 999999", "TEST PASSENGER",
-            new ContactData(email: Email.FromString("test@test.com")));
+        var passengerInfo = new PassengerInfoDto(passengerId, passengerName,
+            new ContactData(email: Email.FromString(email)));
         var request = new BookingRequestDto
         {
             ItineraryFlightsIds = new[] { moscowBryanskFlightId },
             PassengersInfos = new HashSet<PassengerInfoDto> { passengerInfo },
-            FareConditions = FareConditions.Economy
+            FareConditions = fareConditions
         };
         
         var response = await Client.PostAsJsonAsync("/api/flights/book", request, SerializerOptions);
@@ -52,16 +57,23 @@ public class FlightsControllerTest(BookingsAppFactory factory) : BaseDatabaseInt
             .FirstOrDefaultAsync(b => b.BookRef == expectedBookRef);
 
         Assert.NotNull(bookingInDb);
-        Assert.Equal(1000m, bookingInDb.TotalAmount);
+        Assert.Equal(MockConstItineraryPricingService.MockPrice, bookingInDb.TotalAmount);
+        Assert.Single(bookingInDb.Tickets);
 
-        var ticketInDb = Assert.Single(bookingInDb.Tickets);
-
+        var ticketInDb = await DbContext.Tickets.FirstOrDefaultAsync(t => t.BookRef == bookingInDb.BookRef);
+        
+        Assert.NotNull(ticketInDb);
+        Assert.Single(ticketInDb.TicketFlights);
         Assert.Equal(expectedTicketNo, ticketInDb.TicketNo);
         Assert.Equal(passengerInfo.PassengerId, ticketInDb.PassengerId);
         Assert.Equal(passengerInfo.PassengerName, ticketInDb.PassengerName);
         Assert.Equal(passengerInfo.ContactData, ticketInDb.ContactData);
 
-        var ticketFlightInDb = Assert.Single(ticketInDb.TicketFlights);
+        var ticketFlightInDb = await DbContext.TicketFlights
+            .FirstOrDefaultAsync(tf => tf.TicketNo == ticketInDb.TicketNo);
+        Assert.NotNull(ticketFlightInDb);
         Assert.Equal(moscowBryanskFlightId, ticketFlightInDb.FlightId);
+        Assert.Equal(fareConditions, ticketFlightInDb.FareConditions);
+        Assert.Equal(MockConstItineraryPricingService.MockPrice, ticketFlightInDb.Amount);
     }
 }

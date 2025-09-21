@@ -1,7 +1,7 @@
-﻿using System.Data.Common;
+﻿using System.Text.Json;
 using Bookings.Api.IntegrationTests.Factories;
 using Bookings.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Bookings.Infrastructure.Serialization;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +12,7 @@ public abstract class BaseDatabaseIntegrationTest : IClassFixture<BookingsAppFac
     private readonly IServiceScope _scope;
     private IDbContextTransaction? _transaction;
     private readonly BookingsAppFactory _factory;
+    protected JsonSerializerOptions SerializerOptions => GetSerializerOptions();
     
     protected HttpClient Client { get; }
     protected BookingsDbContext DbContext { get; }
@@ -36,7 +37,15 @@ public abstract class BaseDatabaseIntegrationTest : IClassFixture<BookingsAppFac
         {
             await _transaction.RollbackAsync();
             await _transaction.DisposeAsync();
+            _factory.ActiveTransaction = null;
         }
         _scope.Dispose();
     }
+
+    private static JsonSerializerOptions GetSerializerOptions() 
+        => new() 
+        {
+            Converters = { new StringBackedDataJsonConverterFactory() },
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
 }

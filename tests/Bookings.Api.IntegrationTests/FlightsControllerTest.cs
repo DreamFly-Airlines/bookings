@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Bookings.Api.Dto;
 using Bookings.Api.IntegrationTests.Abstractions;
 using Bookings.Api.IntegrationTests.Factories;
@@ -8,6 +9,7 @@ using Bookings.Application.Bookings.Dto;
 using Bookings.Domain.Bookings.Enums;
 using Bookings.Domain.Bookings.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Xunit.Abstractions;
 
 namespace Bookings.Api.IntegrationTests;
 
@@ -37,14 +39,14 @@ public class FlightsControllerTest(BookingsAppFactory factory) : BaseDatabaseInt
             new ContactData(email: Email.FromString(email)));
         var request = new BookingRequestDto
         {
-            ItineraryFlightsIds = new[] { moscowBryanskFlightId },
-            PassengersInfos = new HashSet<PassengerInfoDto> { passengerInfo },
+            ItineraryFlightsIds = [moscowBryanskFlightId],
+            PassengersInfos = [passengerInfo],
             FareConditions = fareConditions
         };
-        
+
         var response = await Client.PostAsJsonAsync("/api/flights/book", request, SerializerOptions);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
+        
         var generator = new MockConstStringBackedDataGeneratorService();
         var expectedBookRef = BookRef.FromString(
             generator.Generate(BookRef.BookRefLength, true, true));
@@ -72,6 +74,7 @@ public class FlightsControllerTest(BookingsAppFactory factory) : BaseDatabaseInt
         var ticketFlightInDb = await DbContext.TicketFlights
             .FirstOrDefaultAsync(tf => tf.TicketNo == ticketInDb.TicketNo);
         Assert.NotNull(ticketFlightInDb);
+        
         Assert.Equal(moscowBryanskFlightId, ticketFlightInDb.FlightId);
         Assert.Equal(fareConditions, ticketFlightInDb.FareConditions);
         Assert.Equal(MockConstItineraryPricingService.MockPrice, ticketFlightInDb.Amount);

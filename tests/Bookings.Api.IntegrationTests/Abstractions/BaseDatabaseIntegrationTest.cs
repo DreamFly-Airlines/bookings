@@ -12,7 +12,7 @@ public abstract class BaseDatabaseIntegrationTest : IClassFixture<BookingsAppFac
     private readonly IServiceScope _scope;
     private IDbContextTransaction? _transaction;
     private readonly BookingsAppFactory _factory;
-    protected JsonSerializerOptions SerializerOptions => GetSerializerOptions();
+    protected static JsonSerializerOptions SerializerOptions => GetSerializerOptions();
     
     protected HttpClient Client { get; }
     protected BookingsDbContext DbContext { get; }
@@ -45,7 +45,10 @@ public abstract class BaseDatabaseIntegrationTest : IClassFixture<BookingsAppFac
     private static JsonSerializerOptions GetSerializerOptions() 
         => new() 
         {
-            Converters = { new StringBackedDataJsonConverterFactory() },
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            Converters =
+            {
+                new StringBackedDataJsonConverterFactory(), 
+                new ContactDataJsonConverter()
+            }
         };
 }

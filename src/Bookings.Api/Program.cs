@@ -35,6 +35,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(opts =>
     {
         opts.JsonSerializerOptions.Converters.Add(new StringBackedDataJsonConverterFactory());
+        opts.JsonSerializerOptions.Converters.Add(new ContactDataJsonConverter());
     });
 
 var app = builder.Build();

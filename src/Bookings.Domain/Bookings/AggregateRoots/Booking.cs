@@ -13,7 +13,6 @@ public class Booking : AggregateRoot<IDomainEvent>
     public BookRef BookRef { get; }
     public DateTime BookDate { get; }
     public decimal TotalAmount { get; private set; }
-
     public BookingStatus Status { get; private set; }
 
     public IReadOnlySet<Ticket> Tickets => _tickets;

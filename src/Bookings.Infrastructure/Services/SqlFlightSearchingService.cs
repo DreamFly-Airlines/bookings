@@ -4,7 +4,7 @@ using Bookings.Domain.Bookings.Enums;
 using Bookings.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bookings.Infrastructure;
+namespace Bookings.Infrastructure.Services;
 
 public class SqlFlightSearchingService(BookingsDbContext dbContext) : IFlightSearchingService
 {

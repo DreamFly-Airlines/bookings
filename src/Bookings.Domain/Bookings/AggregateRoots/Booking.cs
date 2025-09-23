@@ -13,6 +13,9 @@ public class Booking : AggregateRoot<IDomainEvent>
     public BookRef BookRef { get; }
     public DateTime BookDate { get; }
     public decimal TotalAmount { get; private set; }
+
+    public BookingStatus Status { get; private set; }
+
     public IReadOnlySet<Ticket> Tickets => _tickets;
 
     private readonly HashSet<Ticket> _tickets;
@@ -31,6 +34,7 @@ public class Booking : AggregateRoot<IDomainEvent>
         BookDate = bookDate;
         TotalAmount = 0;
         _tickets = [];
+        Status = BookingStatus.Pending; 
         foreach (var ticketInfo in passengersTicketsInfo)
         {
             var ticket = new Ticket(
@@ -44,6 +48,26 @@ public class Booking : AggregateRoot<IDomainEvent>
                 ticket.AddFlight(flightId, fareConditions, ticketInfo.TicketCost);
         }
         AddDomainEvent(new BookingMade(BookRef));
+    }
+
+    public void MarkAsPaid() => MarkAsPaidOrCancelAndPublish(BookingStatus.Paid);
+
+    public void Cancel() => MarkAsPaidOrCancelAndPublish(BookingStatus.Cancelled);
+
+    private void MarkAsPaidOrCancelAndPublish(BookingStatus value)
+    {
+        if (Status is BookingStatus.Pending)
+        {
+            Status = value;
+            AddDomainEvent(Status is BookingStatus.Paid
+                ? new BookingPaid(BookRef)
+                : new BookingCancelled(BookRef));
+        }
+        else
+            throw new InvalidDomainOperationException(
+                $"Cannot set {nameof(Status)} of {nameof(Booking)} " +
+                $"with {nameof(BookRef)} \"{BookRef}\" to {value} " +
+                $"because {nameof(Status)} is not {nameof(BookingStatus.Pending)}, it is {Status}.");
     }
 
     private void AddTicketAndEvaluateTotalAmountOrThrow(Ticket ticketNo, decimal ticketCost)

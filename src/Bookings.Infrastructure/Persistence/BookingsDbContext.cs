@@ -2,6 +2,7 @@
 using Bookings.Application.Bookings.ReadModels.ReadModels;
 using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Entities;
+using Bookings.Domain.Bookings.Enums;
 using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Infrastructure.Converters;
 using Microsoft.EntityFrameworkCore;
@@ -132,6 +133,8 @@ public partial class BookingsDbContext : DbContext
                 .HasConstraintName("boarding_passes_ticket_no_fkey");
         });
 
+        const string bookingStatusColumnName = "booking_status";
+        modelBuilder.HasPostgresEnum<BookingStatus>(name: bookingStatusColumnName);
         modelBuilder.Entity<Booking>(entity =>
         {
             entity.HasKey(e => e.BookRef)
@@ -152,6 +155,10 @@ public partial class BookingsDbContext : DbContext
                 .HasPrecision(10, 2)
                 .HasComment("Total booking cost")
                 .HasColumnName("total_amount");
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasColumnType(bookingStatusColumnName)
+                .HasComment("Booking status");
         });
 
         modelBuilder.Entity<Flight>(entity =>

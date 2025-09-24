@@ -11,5 +11,5 @@ public interface IBookingRepository
     
     public Task DeleteAsync(Booking booking, CancellationToken cancellationToken = default);
     
-    public Task UpdateAsync(Booking booking, CancellationToken cancellationToken = default);
+    public Task SaveChangesAsync(Booking booking, CancellationToken cancellationToken = default);
 }

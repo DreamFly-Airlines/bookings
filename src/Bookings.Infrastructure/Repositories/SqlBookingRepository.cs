@@ -27,7 +27,7 @@ public class SqlBookingRepository(BookingsDbContext dbContext) : IBookingReposit
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public Task UpdateAsync(Booking booking, CancellationToken cancellationToken = default)
+    public Task SaveChangesAsync(Booking booking, CancellationToken cancellationToken = default)
     {
         return Task.CompletedTask;
     }

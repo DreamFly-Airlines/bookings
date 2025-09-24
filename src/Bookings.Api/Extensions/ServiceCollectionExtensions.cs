@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using Bookings.Application.Abstractions;
+using Bookings.Infrastructure.Consumers;
+using Confluent.Kafka;
 
 namespace Bookings.Api.Extensions;
 
@@ -17,6 +19,17 @@ public static class ServiceCollectionExtensions
     {
         var handlerInterfaceType = typeof(ICommandHandler<>);
         services.FindImplementationsAndRegister(handlerInterfaceType, assembly);
+    }
+
+    public static void AddKafkaConsumers(this IServiceCollection services, IConfiguration configuration)
+    {
+        var consumerConfig = new ConsumerConfig();
+        configuration.GetSection("Kafka:ConsumerSettings").Bind(consumerConfig);
+        
+        services.AddTransient<IConsumer<Ignore, string>>(_ => 
+            new ConsumerBuilder<Ignore, string>(consumerConfig).Build());
+
+        services.AddHostedService<PaymentsEventsConsumer>();
     }
 
     private static void FindImplementationsAndRegister(this IServiceCollection services, Type interfaceType, Assembly assembly)

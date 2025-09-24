@@ -46,7 +46,7 @@ public class Booking : AggregateRoot<IDomainEvent>
             foreach (var flightId in flightsIdsForTicket)
                 ticket.AddFlight(flightId, fareConditions, ticketInfo.TicketCost);
         }
-        AddDomainEvent(new BookingMade(BookRef));
+        AddDomainEvent(new BookingCreated(BookRef));
     }
 
     public void MarkAsPaid() => MarkAsPaidOrCancelAndPublish(BookingStatus.Paid);

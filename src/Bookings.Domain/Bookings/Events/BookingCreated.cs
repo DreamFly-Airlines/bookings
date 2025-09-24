@@ -3,4 +3,4 @@ using Bookings.Domain.Shared.Abstractions;
 
 namespace Bookings.Domain.Bookings.Events;
 
-public record BookingMade(BookRef BookRef) : IDomainEvent;
+public record BookingCreated(BookRef BookRef) : IDomainEvent;

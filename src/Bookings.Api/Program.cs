@@ -8,6 +8,7 @@ using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Infrastructure;
 using Bookings.Infrastructure.Commands;
+using Bookings.Infrastructure.Events;
 using Bookings.Infrastructure.Persistence;
 using Bookings.Infrastructure.Queries;
 using Bookings.Infrastructure.Repositories;
@@ -20,6 +21,7 @@ builder.Services.AddNpgsql<BookingsDbContext>(builder.Configuration.GetConnectio
 
 builder.Services.AddScoped<IQuerySender, ServiceProviderQuerySender>();
 builder.Services.AddScoped<ICommandSender, ServiceProviderCommandSender>();
+builder.Services.AddScoped<IEventPublisher, ServiceProviderEventsPublisher>();
 builder.Services.AddScoped<IFlightSearchingService, SqlFlightSearchingService>();
 builder.Services.AddScoped<IBookingRepository, SqlBookingRepository>();
 builder.Services.AddScoped<IClockService, SqlClockService>();

@@ -30,6 +30,6 @@ public class FlightsController(
         var bookCommand = new MakeBookingCommand(
             request.ItineraryFlightsIds, request.PassengersInfos, request.FareConditions);
         await commandSender.SendAsync(bookCommand);
-        return Ok();
+        return Created();
     }
 }

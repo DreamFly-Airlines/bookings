@@ -37,6 +37,7 @@ public class PaymentsEventsConsumer : BackgroundService
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await Task.Yield();
         _consumer.Subscribe(PaymentsTopicName);
         while (!stoppingToken.IsCancellationRequested)
         {

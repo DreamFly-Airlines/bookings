@@ -7,58 +7,71 @@ using Bookings.Domain.Payments.Abstractions;
 using Bookings.Domain.Payments.Enums;
 using Bookings.Domain.Payments.Events;
 using Confluent.Kafka;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Bookings.Infrastructure.Consumers;
 
-public class PaymentsEventsConsumer(
-    ILogger<PaymentsEventsConsumer> logger,
-    IConsumer<Ignore, string> consumer, 
-    IServiceScopeFactory scopeFactory) : BackgroundService
+public class PaymentsEventsConsumer : BackgroundService
 {
+    private readonly ILogger<PaymentsEventsConsumer> _logger;
+    private readonly IConsumer<Ignore, string> _consumer;
+    private readonly IServiceScopeFactory _scopeFactory;
+    
     private const string EventTypeHeader = "event-type";
     private const string PaymentsTopicName = "payments-events";
-    
 
+    public PaymentsEventsConsumer(
+        ILogger<PaymentsEventsConsumer> logger,
+        IConfiguration configuration,
+        IServiceScopeFactory scopeFactory)
+    {
+        _logger = logger;
+        var consumerConfig = new ConsumerConfig();
+        configuration.GetSection("Kafka:PaymentsEvents:ConsumerSettings").Bind(consumerConfig);
+        _consumer = new ConsumerBuilder<Ignore, string>(consumerConfig).Build();
+        _scopeFactory = scopeFactory;
+    }
+    
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        consumer.Subscribe(PaymentsTopicName);
+        _consumer.Subscribe(PaymentsTopicName);
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                var result = consumer.Consume(stoppingToken);
+                var result = _consumer.Consume(stoppingToken);
                 var eventTypeHeader = result.Message.Headers.FirstOrDefault(h => h.Key == EventTypeHeader);
                 if (eventTypeHeader is null)
                     throw new InvalidOperationException($"Missing header: {EventTypeHeader}");
                 var stringEventType = eventTypeHeader.GetValueBytes() is { } bytes
                     ? System.Text.Encoding.UTF8.GetString(bytes)
                     : null;
-                logger.LogInformation(
+                _logger.LogInformation(
                     $"Got event \"{eventTypeHeader}\" for {nameof(Booking)} with {nameof(BookRef)} " +
                     $"\"{result.Message.Value}\".");
                 var eventType = GetEventTypeOrThrow(stringEventType);
-                using var scope = scopeFactory.CreateScope();
+                using var scope = _scopeFactory.CreateScope();
                 var commandSender = scope.ServiceProvider.GetRequiredService<ICommandSender>();
                 await SendCommandDependOnEventType(eventType, commandSender, result.Message.Value, stoppingToken);
             }
             catch (FormatException e)
             {
-                logger.LogError(e.Message);
+                _logger.LogError("{ErrorMessage}", e.Message);
             }
             catch (ConsumeException e)
             {
-                logger.LogCritical(e.Message);
+                _logger.LogCritical("{ErrorMessage}", e.Message);
             }
             catch (InvalidOperationException e)
             {
-                logger.LogCritical(e.Message);
+                _logger.LogCritical("{ErrorMessage}", e.Message);
             }
             catch (ArgumentException e)
             {
-                logger.LogCritical(e.Message);
+                _logger.LogCritical("{ErrorMessage}", e.Message);
             }
         }
     }

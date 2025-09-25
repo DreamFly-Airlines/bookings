@@ -27,7 +27,7 @@ builder.Services.AddSingleton<IStringBackedDataGeneratorService, CryptographyStr
 
 builder.Services.AddQueryHandlers(typeof(SearchFlightsItineraryQueryQueryHandler).Assembly);
 builder.Services.AddCommandHandlers(typeof(MakeBookingCommandHandler).Assembly);
-builder.Services.AddKafkaConsumers(builder.Configuration);
+builder.Services.AddKafkaConsumers();
 
 builder.Services.AddEndpointsApiExplorer(); 
 builder.Services.AddSwaggerGen();

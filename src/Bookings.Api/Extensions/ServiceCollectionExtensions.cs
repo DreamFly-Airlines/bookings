@@ -21,14 +21,8 @@ public static class ServiceCollectionExtensions
         services.FindImplementationsAndRegister(handlerInterfaceType, assembly);
     }
 
-    public static void AddKafkaConsumers(this IServiceCollection services, IConfiguration configuration)
+    public static void AddKafkaConsumers(this IServiceCollection services)
     {
-        var consumerConfig = new ConsumerConfig();
-        configuration.GetSection("Kafka:ConsumerSettings").Bind(consumerConfig);
-        
-        services.AddTransient<IConsumer<Ignore, string>>(_ => 
-            new ConsumerBuilder<Ignore, string>(consumerConfig).Build());
-
         services.AddHostedService<PaymentsEventsConsumer>();
     }
 

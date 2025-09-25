@@ -1,4 +1,5 @@
-﻿using Bookings.Domain.Bookings.AggregateRoots;
+﻿using Bookings.Application.Abstractions;
+using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Infrastructure.Persistence;
@@ -6,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bookings.Infrastructure.Repositories;
 
-public class SqlBookingRepository(BookingsDbContext dbContext) : IBookingRepository
+public class SqlBookingRepository(
+    IEventPublisher eventPublisher,
+    BookingsDbContext dbContext) : IBookingRepository
 {
     public async Task AddAsync(Booking booking, CancellationToken cancellationToken = default)
     {
@@ -27,8 +30,11 @@ public class SqlBookingRepository(BookingsDbContext dbContext) : IBookingReposit
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public Task SaveChangesAsync(Booking booking, CancellationToken cancellationToken = default)
+    public async Task SaveChangesAsync(Booking booking, CancellationToken cancellationToken = default)
     {
-        return Task.CompletedTask;
+        foreach (var @event in booking.DomainEvents)
+            await eventPublisher.PublishAsync(@event, cancellationToken);
+        booking.ClearDomainEvents();
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

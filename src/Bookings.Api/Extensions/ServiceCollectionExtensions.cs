@@ -21,6 +21,17 @@ public static class ServiceCollectionExtensions
         services.FindImplementationsAndRegister(handlerInterfaceType, assembly);
     }
 
+    public static void AddEventHandlers(this IServiceCollection services, Assembly assembly)
+    {
+        var handlersInfos = assembly.GetTypes()
+            .Where(t => t is { IsAbstract: false, IsInterface: false })
+            .SelectMany(t => t.GetInterfaces()
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEventHandler<>))
+                .Select(i => new { HandlerInterface = i, HandlerImplementation = t }));
+        foreach (var handlerInfo in handlersInfos)
+            services.AddScoped(handlerInfo.HandlerInterface, handlerInfo.HandlerImplementation);
+    }
+
     public static void AddKafkaConsumers(this IServiceCollection services)
     {
         services.AddHostedService<PaymentsEventsConsumer>();

@@ -1,6 +1,7 @@
 using Bookings.Api.Extensions;
 using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Commands;
+using Bookings.Application.Bookings.EventHandlers;
 using Bookings.Application.Bookings.Queries;
 using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.Repositories;
@@ -27,9 +28,10 @@ builder.Services.AddSingleton<IStringBackedDataGeneratorService, CryptographyStr
 
 builder.Services.AddQueryHandlers(typeof(SearchFlightsItineraryQueryQueryHandler).Assembly);
 builder.Services.AddCommandHandlers(typeof(MakeBookingCommandHandler).Assembly);
+builder.Services.AddEventHandlers(typeof(BookingCancelledEventHandler).Assembly);
 builder.Services.AddKafkaConsumers();
 
-builder.Services.AddEndpointsApiExplorer(); 
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers()

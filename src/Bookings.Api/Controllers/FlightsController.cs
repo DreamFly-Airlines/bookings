@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bookings.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/flights")]
 public class FlightsController(
     ICommandSender commandSender,
     IQuerySender querySender) : Controller

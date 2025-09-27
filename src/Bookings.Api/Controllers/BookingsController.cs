@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bookings.Api.Controllers;
 
+[ApiController]
+[Route("/api/bookings")]
 public class BookingsController(IQuerySender querySender) : Controller
 {
     [HttpGet("{bookRef}")]

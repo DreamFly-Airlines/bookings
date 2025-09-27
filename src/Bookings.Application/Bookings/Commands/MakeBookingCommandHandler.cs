@@ -4,10 +4,12 @@ using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
+using Microsoft.Extensions.Logging;
 
 namespace Bookings.Application.Bookings.Commands;
 
 public class MakeBookingCommandHandler(
+    ILogger<MakeBookingCommandHandler> logger,
     IItineraryPricingService pricingService,
     IClockService clockService,
     IBookingRepository bookingRepository,
@@ -15,7 +17,8 @@ public class MakeBookingCommandHandler(
 {
     public async Task HandleAsync(MakeBookingCommand command, CancellationToken cancellationToken = default)
     {
-        var bookRef = BookRef.FromString(generator.Generate(BookRef.BookRefLength, true, true));
+        var bookRef = BookRef.FromString(
+            generator.Generate(BookRef.BookRefLength, true, true));
         var ticketCost = await pricingService.CalculatePriceAsync(
             command.ItineraryFlightsIds, command.FareConditions, cancellationToken);
         var ticketsInfo = command.PassengersInfos
@@ -33,9 +36,12 @@ public class MakeBookingCommandHandler(
         var booking = new Booking(
             bookRef, 
             bookDate, 
-            command.FareConditions, 
+            command.FareConditions,
             command.ItineraryFlightsIds, 
             ticketsInfo);
         await bookingRepository.AddAsync(booking, cancellationToken);
+        logger.LogInformation(
+            "{BookingName} with {BookRefName} \"{BookingBookRef}\" created.", 
+            nameof(Booking), nameof(BookRef), booking.BookRef);
     }
 }

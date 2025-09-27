@@ -5,7 +5,6 @@ using Bookings.Api.Dto;
 using Bookings.Api.IntegrationTests.Abstractions;
 using Bookings.Api.IntegrationTests.Factories;
 using Bookings.Api.IntegrationTests.Mocks;
-using Bookings.Application.Bookings.Dto;
 using Bookings.Domain.Bookings.Enums;
 using Bookings.Domain.Bookings.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +35,7 @@ public class FlightsControllerTest(BookingsAppFactory factory) : BaseDatabaseInt
         Assert.NotNull(moscowBryanskFlight);
         
         var passengerInfo = new PassengerInfoDto(passengerId, passengerName,
-            new ContactData(email: Email.FromString(email)));
+            new ContactDataDto(Email:Email.FromString(email)));
         var request = new BookingRequestDto
         {
             ItineraryFlightsIds = [moscowBryanskFlightId],
@@ -69,7 +68,9 @@ public class FlightsControllerTest(BookingsAppFactory factory) : BaseDatabaseInt
         Assert.Equal(expectedTicketNo, ticketInDb.TicketNo);
         Assert.Equal(passengerInfo.PassengerId, ticketInDb.PassengerId);
         Assert.Equal(passengerInfo.PassengerName, ticketInDb.PassengerName);
-        Assert.Equal(passengerInfo.ContactData, ticketInDb.ContactData);
+
+        var contactData = new ContactData(email: Email.FromString(email));
+        Assert.Equal(contactData, ticketInDb.ContactData);
 
         var ticketFlightInDb = await DbContext.TicketFlights
             .FirstOrDefaultAsync(tf => tf.TicketNo == ticketInDb.TicketNo);

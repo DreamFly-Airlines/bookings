@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Bookings.Application.Bookings.Dto;
 using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.Enums;
-using Bookings.Domain.Bookings.ValueObjects;
 
 namespace Bookings.Api.Dto;
 

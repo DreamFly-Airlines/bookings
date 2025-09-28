@@ -14,7 +14,7 @@ public class FlightsController(
     IQuerySender querySender) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> FindMatchingFlights([FromQuery] FlightsSearchDto dto)
+    public async Task<IActionResult> FindMatchingFlights([FromQuery] SearchFlightsRequest dto)
     {
         var query = new SearchFlightsItineraryQuery(
             dto.DepartureCity, 
@@ -26,29 +26,13 @@ public class FlightsController(
     }
 
     [HttpPost("book")]
-    public async Task<IActionResult> MakeBooking([FromBody] BookingRequestDto request)
+    public async Task<IActionResult> MakeBooking([FromBody] MakeBookingRequest request)
     {
-        try
-        {
-            var passengersInfos = request.PassengersInfos.Select(dto =>
-            {
-                var email = dto.ContactDataDto.Email is null 
-                    ? (Email?)null 
-                    : Email.FromString(dto.ContactDataDto.Email);
-                var phoneNumber = dto.ContactDataDto.PhoneNumber is null 
-                    ? (PhoneNumber?)null 
-                    : PhoneNumber.FromString(dto.ContactDataDto.PhoneNumber);
-                return (dto.PassengerId, dto.PassengerName, new ContactData(email: email, phoneNumber: phoneNumber));
-            }).ToHashSet();
-            var bookCommand = new MakeBookingCommand(
-                request.ItineraryFlightsIds, passengersInfos, request.FareConditions);
-            await commandSender.SendAsync(bookCommand);
-            return Created();
-        }
-        catch (FormatException ex)
-        {
-            ModelState.AddModelError($"incorrectFormat", ex.Message);
-            return BadRequest(ModelState);
-        }
+        var bookCommand = new MakeBookingCommand(
+            request.ItineraryFlightsIds, 
+            request.PassengersInfos, 
+            request.FareConditions);
+        await commandSender.SendAsync(bookCommand);
+        return Created();
     }
 }

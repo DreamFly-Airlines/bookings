@@ -5,6 +5,7 @@ using Bookings.Api.Dto;
 using Bookings.Api.IntegrationTests.Abstractions;
 using Bookings.Api.IntegrationTests.Factories;
 using Bookings.Api.IntegrationTests.Mocks;
+using Bookings.Application.Bookings.Dto;
 using Bookings.Domain.Bookings.Enums;
 using Bookings.Domain.Bookings.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +37,7 @@ public class FlightsControllerTest(BookingsAppFactory factory) : BaseDatabaseInt
         
         var passengerInfo = new PassengerInfoDto(passengerId, passengerName,
             new ContactDataDto(Email:Email.FromString(email)));
-        var request = new BookingRequestDto
+        var request = new MakeBookingRequest
         {
             ItineraryFlightsIds = [moscowBryanskFlightId],
             PassengersInfos = [passengerInfo],

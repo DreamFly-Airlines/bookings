@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Bookings.Application.Bookings.Dto;
 using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.Enums;
 
 namespace Bookings.Api.Dto;
 
-public record BookingRequestDto
+public record MakeBookingRequest
 {
     [Required]
     [MinLength(1, ErrorMessage = "At least 1 passenger is required.")]

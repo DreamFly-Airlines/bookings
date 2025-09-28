@@ -2,7 +2,7 @@
 
 namespace Bookings.Api.Dto;
 
-public record FlightsSearchDto
+public record SearchFlightsRequest
 {
     [Required] public string DepartureCity { get; init; } = null!;
     [Required] public string ArrivalCity { get; init; } = null!;

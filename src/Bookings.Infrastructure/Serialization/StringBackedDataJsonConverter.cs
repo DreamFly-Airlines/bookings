@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using Bookings.Domain.Shared.Abstractions;
+using Bookings.Domain.Bookings.Abstractions;
 
 namespace Bookings.Infrastructure.Serialization;
 

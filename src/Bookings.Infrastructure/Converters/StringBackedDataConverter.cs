@@ -1,4 +1,4 @@
-﻿using Bookings.Domain.Shared.Abstractions;
+﻿using Bookings.Domain.Bookings.Abstractions;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Bookings.Infrastructure.Converters;

@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
+using Bookings.Domain.Bookings.Abstractions;
 using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.Enums;
 using Bookings.Domain.Bookings.Events;
+using Bookings.Domain.Bookings.Exceptions;
 using Bookings.Domain.Bookings.ValueObjects;
-using Bookings.Domain.Shared.Abstractions;
-using Bookings.Domain.Shared.Exceptions;
 
 namespace Bookings.Domain.Bookings.AggregateRoots;
 

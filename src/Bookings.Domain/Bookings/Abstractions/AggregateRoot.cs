@@ -1,4 +1,4 @@
-﻿namespace Bookings.Domain.Shared.Abstractions;
+﻿namespace Bookings.Domain.Bookings.Abstractions;
 
 public abstract class AggregateRoot<TDomainEvent>
 {

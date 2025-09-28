@@ -1,4 +1,6 @@
-﻿namespace Bookings.Domain.Bookings.ValueObjects;
+﻿using Bookings.Domain.Bookings.Exceptions;
+
+namespace Bookings.Domain.Bookings.ValueObjects;
 
 public readonly record struct ContactData
 {
@@ -8,7 +10,7 @@ public readonly record struct ContactData
     public ContactData(Email? email = null, PhoneNumber? phoneNumber = null)
     {
         if (email is null && phoneNumber is null)
-            throw new FormatException($"At least {nameof(phoneNumber)} or {nameof(email)} is required.");
+            throw new InvalidDataFormatException("At least phone number or email is required.");
         Email = email;
         PhoneNumber = phoneNumber;
     }

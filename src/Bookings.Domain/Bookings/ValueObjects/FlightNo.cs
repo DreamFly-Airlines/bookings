@@ -1,4 +1,5 @@
-﻿using Bookings.Domain.Shared.Abstractions;
+﻿using Bookings.Domain.Bookings.Abstractions;
+using Bookings.Domain.Bookings.Exceptions;
 
 namespace Bookings.Domain.Bookings.ValueObjects;
 
@@ -12,11 +13,12 @@ public readonly record struct FlightNo : IStringBackedData<FlightNo>
     public static FlightNo FromString(string @string)
     {
         if (@string.Length != FlightNoLength)
-            throw new FormatException($"{nameof(@string)} should be exactly {FlightNoLength} characters");
+            throw new InvalidDataFormatException(
+                $"Flight number should be exactly {FlightNoLength} characters.");
         for (var i = 0; i < @string.Length; i++)
             if (!char.IsDigit(@string[i]) && (@string[i] < 'A' || @string[i] > 'Z'))
-                throw new FormatException(
-                    $"{nameof(@string)} must consist only of numbers and letters A-Z. " +
+                throw new InvalidDataFormatException(
+                    $"Flight number must consist only of numbers and letters A-Z. " +
                     $"Unexpected character {@string[i]} at position {i}.");
         return new(@string);
     }

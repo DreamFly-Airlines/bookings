@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
-using Bookings.Domain.Shared.Abstractions;
+using Bookings.Domain.Bookings.Abstractions;
+using Bookings.Domain.Bookings.Exceptions;
 
 namespace Bookings.Domain.Bookings.ValueObjects;
 
@@ -15,7 +16,7 @@ public readonly partial struct Email : IStringBackedData<Email>
     public static Email FromString(string email)
     {
         if (!EmailRegex.IsMatch(email))
-            throw new FormatException($"Incorrect format of {nameof(Email)}: {email}.");
+            throw new InvalidDataFormatException($"Incorrect format of email.");
         return new(email);
     }
 

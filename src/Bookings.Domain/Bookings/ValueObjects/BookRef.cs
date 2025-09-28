@@ -1,4 +1,5 @@
-﻿using Bookings.Domain.Shared.Abstractions;
+﻿using Bookings.Domain.Bookings.Abstractions;
+using Bookings.Domain.Bookings.Exceptions;
 
 namespace Bookings.Domain.Bookings.ValueObjects;
 
@@ -12,11 +13,12 @@ public readonly record struct BookRef : IStringBackedData<BookRef>
     public static BookRef FromString(string @string)
     {
         if (@string.Length != BookRefLength)
-            throw new FormatException($"{nameof(@string)} must have {BookRefLength} digits.");
+            throw new InvalidDataFormatException($"Book ref must have {BookRefLength} digits.");
         for (var i = 0; i < BookRefLength; i++)
             if (!char.IsDigit(@string[i]) && (@string[i] > 'Z' || @string[i] < 'A'))
-                throw new FormatException($"{nameof(@string)} must consist only of digits and letters A-Z. " +
-                                          $"Unexpected character {@string[i]} at position {i}.");
+                throw new InvalidDataFormatException(
+                    $"Book ref must consist only of digits and letters A-Z. " +
+                    $"Unexpected character {@string[i]} at position {i}.");
         return new(@string);
     }
     

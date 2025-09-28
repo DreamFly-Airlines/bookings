@@ -1,4 +1,4 @@
-﻿namespace Bookings.Domain.Shared.Abstractions;
+﻿namespace Bookings.Domain.Bookings.Abstractions;
 
 // TODO: consider using code generator to avoid implementing ToString(), implicit operator string(), etc. everytime
 public interface IStringBackedData<out TSelf> where TSelf : struct, IStringBackedData<TSelf>

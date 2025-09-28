@@ -1,4 +1,5 @@
-﻿using Bookings.Domain.Shared.Abstractions;
+﻿using Bookings.Domain.Bookings.Abstractions;
+using Bookings.Domain.Bookings.Exceptions;
 
 namespace Bookings.Domain.Bookings.ValueObjects;
 
@@ -12,11 +13,12 @@ public readonly record struct IataAirportCode : IStringBackedData<IataAirportCod
     public static IataAirportCode FromString(string @string)
     {
         if (@string.Length != IataAirportCodeLength)
-            throw new FormatException($"{nameof(@string)} should be exactly {IataAirportCodeLength} characters");
+            throw new InvalidDataFormatException(
+                $"Airport code in IATA format should consist of exactly {IataAirportCodeLength} characters.");
         for (var i = 0; i < @string.Length; i++)
             if (@string[i] < 'A' && @string[i] > 'Z')
-                throw new FormatException(
-                    $"{nameof(@string)} must consist only of letters A-Z. " +
+                throw new InvalidDataFormatException(
+                    $"Airport code in IATA format must consist only of letters A-Z. " +
                     $"Unexpected character {@string[i]} at position {i}.");
         return new(@string);
     }

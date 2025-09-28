@@ -1,3 +1,3 @@
-﻿namespace Bookings.Domain.Shared.Exceptions;
+﻿namespace Bookings.Domain.Bookings.Exceptions;
 
 public class InvalidDomainOperationException(string message) : Exception(message);

@@ -15,6 +15,6 @@ public class CancelBookingCommandHandler(
         if (booking is null)
             throw new NotFoundException(nameof(Booking),  command.BookRef, idName: nameof(BookRef));
         booking.Cancel();
-        await  bookingRepository.SaveChangesAsync(booking, cancellationToken);
+        await bookingRepository.SaveChangesAsync(booking, cancellationToken);
     }
 }

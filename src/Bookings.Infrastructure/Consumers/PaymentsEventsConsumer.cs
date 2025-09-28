@@ -1,11 +1,10 @@
 ﻿using System.Text.Json;
 using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Commands;
+using Bookings.Application.Payments.Enums;
+using Bookings.Application.Payments.IntegrationEvents;
 using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.ValueObjects;
-using Bookings.Domain.Payments.Abstractions;
-using Bookings.Domain.Payments.Enums;
-using Bookings.Domain.Payments.Events;
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -99,25 +98,14 @@ public class PaymentsEventsConsumer : BackgroundService
         var command = eventType switch
         {
             PaymentEventType.PaymentConfirmed =>
-                (ICommand)new MarkBookingAsPaidCommand(
-                    ParseBookRefFromPayloadOrThrow<PaymentConfirmed>(jsonPayload)),
-
+                (ICommand)new MarkBookingAsPaidCommand(BookRef.FromString(
+                    JsonSerializer.Deserialize<PaymentConfirmedIntegrationEvent>(jsonPayload)!.BookRef)),
             PaymentEventType.PaymentCancelled =>
-                new CancelBookingCommand(
-                    ParseBookRefFromPayloadOrThrow<PaymentCancelled>(jsonPayload)),
-
+                new CancelBookingCommand(BookRef.FromString(
+                    JsonSerializer.Deserialize<PaymentCancelledIntegrationEvent>(jsonPayload)!.BookRef)),
             _ => throw new ArgumentOutOfRangeException(nameof(eventType), eventType, null)
         };
 
         await commandSender.SendAsync(command, cancellationToken);
-    }
-
-    private static BookRef ParseBookRefFromPayloadOrThrow<TEventType>(
-        string jsonPayload) where TEventType : IPaymentEvent
-    {
-        var stringBookRef = JsonSerializer.Deserialize<TEventType>(jsonPayload)?.BookRef 
-                            ?? throw new ArgumentException(
-                                $"Cannot find {nameof(BookRef)} in {jsonPayload}.");
-        return BookRef.FromString(stringBookRef);
     }
 }

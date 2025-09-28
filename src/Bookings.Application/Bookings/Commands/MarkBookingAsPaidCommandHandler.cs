@@ -1,6 +1,7 @@
 ﻿using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Exceptions;
 using Bookings.Domain.Bookings.AggregateRoots;
+using Bookings.Domain.Bookings.Exceptions;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
 using Microsoft.Extensions.Logging;
@@ -16,10 +17,20 @@ public class MarkBookingAsPaidCommandHandler(
         var booking = await bookingRepository.GetByBookRefAsync(command.BookRef, cancellationToken);
         if (booking is null)
             throw new NotFoundException(nameof(Booking),  command.BookRef, idName: nameof(BookRef));
-        booking.MarkAsPaid();
-        await bookingRepository.SaveChangesAsync(booking, cancellationToken);
-        logger.LogInformation(
-            "{BookingName} with {BookRefName} \"{BookingBookRef}\" paid.", 
-            nameof(Booking), nameof(BookRef), booking.BookRef);
+        try
+        {
+            booking.MarkAsPaid();
+            await bookingRepository.SaveChangesAsync(booking, cancellationToken);
+            logger.LogInformation(
+                "{BookingName} with {BookRefName} \"{BookingBookRef}\" paid.",
+                nameof(Booking), nameof(BookRef), booking.BookRef);
+        }
+        catch (InvalidDomainOperationException ex)
+        {
+            var state = new EntityStateInfo(nameof(Booking), 
+                (nameof(Booking.BookRef), booking.BookRef),
+                (nameof(Booking.Status), booking.Status.ToString()));
+            throw new ValidationException(ex.Message, true, state);
+        }
     }
 }

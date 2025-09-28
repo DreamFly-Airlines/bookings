@@ -1,3 +1,4 @@
+using Bookings.Api.ExceptionHandling;
 using Bookings.Api.Extensions;
 using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Commands;
@@ -41,6 +42,8 @@ builder.Services.AddControllers()
         opts.JsonSerializerOptions.Converters.Add(new StringBackedDataJsonConverterFactory());
         opts.JsonSerializerOptions.Converters.Add(new ContactDataJsonConverter());
     });
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -49,6 +52,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 app.MapControllers();

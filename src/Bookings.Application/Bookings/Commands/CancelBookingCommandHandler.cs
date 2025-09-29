@@ -4,10 +4,12 @@ using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Exceptions;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
+using Microsoft.Extensions.Logging;
 
 namespace Bookings.Application.Bookings.Commands;
 
 public class CancelBookingCommandHandler(
+    ILogger<CancelBookingCommandHandler> logger,
     IBookingRepository bookingRepository) : ICommandHandler<MarkBookingAsPaidCommand>
 {
     public async Task HandleAsync(MarkBookingAsPaidCommand command, CancellationToken cancellationToken = default)
@@ -19,6 +21,8 @@ public class CancelBookingCommandHandler(
         {
             booking.Cancel();
             await bookingRepository.SaveChangesAsync(booking, cancellationToken);
+            logger.LogInformation("{nameofBooking} with {nameofBookRef} \"{bookRef}\" is cancelled", 
+                nameof(Booking), nameof(BookRef), booking.BookRef);
         }
         catch (InvalidDomainOperationException ex)
         {

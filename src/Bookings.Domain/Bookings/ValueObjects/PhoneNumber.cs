@@ -15,18 +15,18 @@ public readonly record struct PhoneNumber : IStringBackedData<PhoneNumber>
         var startsWithPlusSeven = phoneNumber.StartsWith("+7");
         var startsWithEight = phoneNumber.StartsWith('8');
         if (!startsWithPlusSeven && !startsWithEight)
-            throw new InvalidDataFormatException("Phone number must start with \"+7\" or \"8\".)");
+            throw new InvalidDataFormatException("Phone number must start with \"+7\" or \"8\"");
         var toSkip = startsWithEight ? 1 : 2;
         var numberLength = phoneNumber.Length - toSkip;
         if (numberLength != PhoneNumberLength)
             throw new InvalidDataFormatException(
                 $"The part after \"+7\" or \"8\" in phone number " +
-                $"must consist only of {PhoneNumberLength} numbers.");
+                $"must consist only of {PhoneNumberLength} numbers");
         for (var i = toSkip; i < phoneNumber.Length; i++)
             if (!char.IsDigit(phoneNumber[i]))
                 throw new InvalidDataFormatException(
                     $"The part after \"+7\" or \"8\" in phone number " +
-                    $"must consist only of numbers. Unexpected character \"{phoneNumber[i]}\" at position {i}.");
+                    $"must consist only of numbers. Unexpected character \"{phoneNumber[i]}\" at position {i}");
         return new(phoneNumber);
     }
 

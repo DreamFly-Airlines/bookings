@@ -7,7 +7,7 @@ namespace Bookings.Domain.Bookings.Entities;
 public class Flight
 {
     public int FlightId { get; }
-    public FlightNo FlightNo { get;  }
+    public FlightNo FlightNo { get; }
     public DateTime ScheduledDeparture { get; }
     public DateTime ScheduledArrival { get; }
     public IataAirportCode DepartureAirport { get; }
@@ -41,6 +41,7 @@ public class Flight
     public void MarkAsArrived(DateTime arrivalTime)
     {
         SetStatusOrThrow(FlightStatus.Arrived, 
+            "mark flight as arrived",
             FlightStatus.Cancelled, FlightStatus.Arrived, FlightStatus.Departed);
         ActualDeparture = arrivalTime;
     }
@@ -48,6 +49,7 @@ public class Flight
     public void MarkAsDeparted(DateTime departureTime)
     {
         SetStatusOrThrow(FlightStatus.Departed, 
+            "mark flight as departed",
             FlightStatus.Cancelled, FlightStatus.Arrived, FlightStatus.Departed);
         ActualDeparture = departureTime;
     }
@@ -55,6 +57,7 @@ public class Flight
     public void Delay()
     {
         SetStatusOrThrow(FlightStatus.Delayed, 
+            "delay flight",
             FlightStatus.Cancelled, FlightStatus.Arrived, FlightStatus.Departed);
     }
 
@@ -62,17 +65,28 @@ public class Flight
     {
         if (Status is not FlightStatus.Scheduled)
             throw new InvalidDomainOperationException(
-                $"The status of {nameof(Flight)} with {nameof(FlightNo)} \"{FlightNo}\" " +
-                $"and {nameof(ScheduledDeparture)} \"{ScheduledDeparture}\" is {Status}.");
+                "Cannot open flight for register because it's not scheduled");
         Status = isDelayed ? FlightStatus.Delayed : FlightStatus.OnTime;
     }
 
-    private void SetStatusOrThrow(FlightStatus status, params IEnumerable<FlightStatus> conflictingStatuses)
+    private void SetStatusOrThrow(FlightStatus status, 
+        string settingAction,
+        params IEnumerable<FlightStatus> conflictingStatuses)
     {
         if (conflictingStatuses.Contains(Status))
             throw new InvalidDomainOperationException(
-                $"The status of {nameof(Flight)} with {nameof(FlightNo)} \"{FlightNo}\" " +
-                $"and {nameof(ScheduledDeparture)} \"{ScheduledDeparture}\" is {Status}.");
+                $"Cannot {settingAction} because it's {GetHumanReadableStatus()}");
         Status = status;
     }
+
+    private string GetHumanReadableStatus() => Status switch
+    {
+        FlightStatus.Scheduled => "scheduled",
+        FlightStatus.OnTime => "on time",
+        FlightStatus.Delayed => "delayed",
+        FlightStatus.Departed => "departed",
+        FlightStatus.Arrived => "arriver",
+        FlightStatus.Cancelled => "cancelled",
+        _ => throw new ArgumentOutOfRangeException(nameof(Status), Status.ToString())
+    };
 }

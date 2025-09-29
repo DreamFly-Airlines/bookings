@@ -4,4 +4,4 @@ using Bookings.Domain.Bookings.ValueObjects;
 
 namespace Bookings.Application.Bookings.Queries;
 
-public record GetBookingQuery(BookRef BookRef) : IQuery<Booking?>;
+public record GetBookingQuery(BookRef BookRef) : IQuery<Booking>;

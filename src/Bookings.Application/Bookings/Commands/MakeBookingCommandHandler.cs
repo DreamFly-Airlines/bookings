@@ -55,7 +55,7 @@ public class MakeBookingCommandHandler(
         var booking = new Booking(bookRef, bookDate, command.FareConditions, command.ItineraryFlightsIds, ticketsInfo);
         await bookingRepository.AddAsync(booking, cancellationToken);
         logger.LogInformation(
-            "{BookingName} with {BookRefName} \"{BookingBookRef}\" created.",
+            "{nameofBooking} with {nameofBookRef} \"{BookingBookRef}\" created",
             nameof(Booking), nameof(BookRef), booking.BookRef);
     }
 

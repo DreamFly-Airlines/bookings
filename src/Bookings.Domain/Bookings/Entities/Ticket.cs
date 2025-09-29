@@ -35,7 +35,6 @@ public class Ticket
         var ticketFlight = new TicketFlight(TicketNo, flightId, fareConditions, amount);
         if (!_ticketFlights.Add(ticketFlight))
             throw new InvalidDomainOperationException(
-                $"{nameof(Flight)} with ID \"{flightId}\" already added to {nameof(Ticket)} " +
-                $"with {nameof(TicketNo)} \"{TicketNo}\".");
+                "Cannot add flight to ticket because it's already added");
     }
 }

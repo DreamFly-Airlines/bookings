@@ -14,12 +14,12 @@ public readonly record struct IataAirportCode : IStringBackedData<IataAirportCod
     {
         if (@string.Length != IataAirportCodeLength)
             throw new InvalidDataFormatException(
-                $"Airport code in IATA format should consist of exactly {IataAirportCodeLength} characters.");
+                $"Airport code in IATA format should consist of exactly {IataAirportCodeLength} characters");
         for (var i = 0; i < @string.Length; i++)
             if (@string[i] < 'A' && @string[i] > 'Z')
                 throw new InvalidDataFormatException(
                     $"Airport code in IATA format must consist only of letters A-Z. " +
-                    $"Unexpected character {@string[i]} at position {i}.");
+                    $"Unexpected character {@string[i]} at position {i}");
         return new(@string);
     }
     

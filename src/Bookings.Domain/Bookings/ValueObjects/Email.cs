@@ -16,7 +16,7 @@ public readonly partial struct Email : IStringBackedData<Email>
     public static Email FromString(string email)
     {
         if (!EmailRegex.IsMatch(email))
-            throw new InvalidDataFormatException($"Incorrect format of email.");
+            throw new InvalidDataFormatException("Incorrect format of email");
         return new(email);
     }
 

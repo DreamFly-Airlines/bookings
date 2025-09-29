@@ -1,14 +1,15 @@
 ﻿using Bookings.Application.Abstractions;
+using Bookings.Application.Bookings.Exceptions;
 using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Repositories;
+using Bookings.Domain.Bookings.ValueObjects;
 
 namespace Bookings.Application.Bookings.Queries;
 
 public class GetBookingQueryHandler(
-    IBookingRepository bookingRepository) : IQueryHandler<GetBookingQuery, Booking?>
+    IBookingRepository bookingRepository) : IQueryHandler<GetBookingQuery, Booking>
 {
-    public async Task<Booking?> HandleAsync(GetBookingQuery query, CancellationToken cancellationToken = default)
-    {
-        return await bookingRepository.GetByBookRefAsync(query.BookRef, cancellationToken);
-    }
+    public async Task<Booking> HandleAsync(GetBookingQuery query, CancellationToken cancellationToken = default)
+        => await bookingRepository.GetByBookRefAsync(query.BookRef, cancellationToken) 
+               ?? throw new NotFoundException(nameof(Booking), query.BookRef, nameof(BookRef));
 }

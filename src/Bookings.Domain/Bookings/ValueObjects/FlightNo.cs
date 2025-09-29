@@ -14,12 +14,12 @@ public readonly record struct FlightNo : IStringBackedData<FlightNo>
     {
         if (@string.Length != FlightNoLength)
             throw new InvalidDataFormatException(
-                $"Flight number should be exactly {FlightNoLength} characters.");
+                $"Flight number should be exactly {FlightNoLength} characters");
         for (var i = 0; i < @string.Length; i++)
             if (!char.IsDigit(@string[i]) && (@string[i] < 'A' || @string[i] > 'Z'))
                 throw new InvalidDataFormatException(
                     $"Flight number must consist only of numbers and letters A-Z. " +
-                    $"Unexpected character {@string[i]} at position {i}.");
+                    $"Unexpected character {@string[i]} at position {i}");
         return new(@string);
     }
     

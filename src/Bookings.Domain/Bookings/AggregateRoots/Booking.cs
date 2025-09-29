@@ -49,24 +49,42 @@ public class Booking : AggregateRoot<IDomainEvent>
         AddDomainEvent(new BookingCreated(BookRef));
     }
 
-    public void MarkAsPaid() => MarkAsPaidOrCancelAndPublish(BookingStatus.Paid);
-
-    public void Cancel() => MarkAsPaidOrCancelAndPublish(BookingStatus.Cancelled);
-
-    private void MarkAsPaidOrCancelAndPublish(BookingStatus value)
+    public void MarkAsPaid()
     {
         if (Status is BookingStatus.Pending)
         {
-            Status = value;
-            AddDomainEvent(Status is BookingStatus.Paid
-                ? new BookingPaid(BookRef)
-                : new BookingCancelled(BookRef));
+            Status = BookingStatus.Paid;
+            AddDomainEvent(new BookingPaid(BookRef));
         }
         else
-            throw new InvalidDomainOperationException(
-                $"Cannot set {nameof(Status)} of {nameof(Booking)} " +
-                $"with {nameof(BookRef)} \"{BookRef}\" to {value} " +
-                $"because {nameof(Status)} is not {nameof(BookingStatus.Pending)}, it is {Status}.");
+        {
+            var reason = Status switch
+            {
+                BookingStatus.Paid => "already paid",
+                BookingStatus.Cancelled => "cancelled",
+                _ => throw new ArgumentException($"Booking doesn't support {nameof(Status)} {Status}")
+            };
+            throw new InvalidDomainOperationException($"Cannot mark booking as paid because {reason}");
+        }
+    }
+
+    public void Cancel()
+    {
+        if (Status is BookingStatus.Pending)
+        {
+            Status = BookingStatus.Cancelled;
+            AddDomainEvent(new BookingCancelled(BookRef));
+        }
+        else
+        {
+            var reason = Status switch
+            {
+                BookingStatus.Paid => "paid",
+                BookingStatus.Cancelled => "already cancelled",
+                _ => throw new ArgumentException($"Booking doesn't support {nameof(Status)} {Status}")
+            };
+            throw new InvalidDomainOperationException($"Cannot cancel booking because {reason}");
+        }
     }
 
     private void AddTicketAndEvaluateTotalAmountOrThrow(Ticket ticketNo, decimal ticketCost)
@@ -74,9 +92,7 @@ public class Booking : AggregateRoot<IDomainEvent>
         if (_tickets.Add(ticketNo))
             TotalAmount += ticketCost;
         else
-            throw new InvalidDomainOperationException(
-                $"A {nameof(Booking)} with {nameof(BookRef)} \"{BookRef}\" " +
-                $"already has a {nameof(Ticket)} with {nameof(ticketNo)} \"{ticketNo}\".");
+            throw new InvalidDomainOperationException("Booking already has ticket with such ticket number");
     }
     
     // NOTE: consider removing this infrastructure detail

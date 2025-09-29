@@ -14,12 +14,12 @@ public readonly record struct TicketNo : IStringBackedData<TicketNo>
     {
         if (@string.Length != TicketNoLength)
             throw new InvalidDataFormatException(
-                $"Ticker number should consist of exactly {TicketNoLength} characters.");
+                $"Ticker number should consist of exactly {TicketNoLength} characters");
         for (var i = 0; i < @string.Length; i++)
             if (!char.IsDigit(@string[i]))
                 throw new InvalidDataFormatException(
                     $"Ticket number must consist only of numbers. " +
-                    $"Unexpected character {@string[i]} at position {i}.");
+                    $"Unexpected character {@string[i]} at position {i}");
         return new(@string);
     }
     

@@ -22,7 +22,7 @@ public class MarkBookingAsPaidCommandHandler(
             booking.MarkAsPaid();
             await bookingRepository.SaveChangesAsync(booking, cancellationToken);
             logger.LogInformation(
-                "{BookingName} with {BookRefName} \"{BookingBookRef}\" paid.",
+                "{nameofBooking} with {nameofBookRef} \"{BookRef}\" paid",
                 nameof(Booking), nameof(BookRef), booking.BookRef);
         }
         catch (InvalidDomainOperationException ex)

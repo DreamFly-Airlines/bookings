@@ -1,4 +1,5 @@
-﻿using Bookings.Application.Bookings.Exceptions;
+﻿using Bookings.Application.Abstractions;
+using Bookings.Application.Bookings.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +16,8 @@ public class GlobalExceptionHandler: IExceptionHandler
         _handlers = new()
         {
             { typeof(NotFoundException), HandleNotFoundAsync },
-            { typeof(ValidationException), HandleValidationAsync },
+            { typeof(ServerValidationException), HandleServerValidationAsync },
+            { typeof(ClientValidationException), HandleClientValidationAsync },
             { typeof(Exception), HandleExceptionAsync }
         };
     }
@@ -37,22 +39,37 @@ public class GlobalExceptionHandler: IExceptionHandler
         HttpContext httpContext, 
         string errorType, 
         int statusCode, 
-        string? messageForClient = null,
+        string message,
+        bool shouldIncludeMessageToClientResponse,
         string? additionalInfoForServer = null)
     {
-        var additionalInfo = additionalInfoForServer is null ? string.Empty : $" {additionalInfoForServer}";
         var traceId = httpContext.TraceIdentifier;
+        var fullMessageForServer = additionalInfoForServer is not null
+            ? $"{message}. Additional info: {additionalInfoForServer}"
+            : message;
         _logger.LogError(
-            "Error for trace id \"{TraceId}\": {MessageForClient}{AdditionalInfo}", 
-            traceId, messageForClient, additionalInfo);
+            "Error for trace id \"{traceId}\": {messageForServer}", 
+            traceId, fullMessageForServer);
         httpContext.Response.StatusCode = statusCode;
         await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
         {
-            Detail = messageForClient,
+            Detail = shouldIncludeMessageToClientResponse ? null : message,
             Status = statusCode,
             Instance = httpContext.Request.Path,
             Type = errorType
         });
+    }
+    
+    private async Task HandleValidationAsync(HttpContext httpContext, Exception exception, bool isClient)
+    {
+        var ex = (BaseValidationException)exception;
+        await HandleAsync(
+            httpContext,
+            "Internal server error",
+            StatusCodes.Status500InternalServerError,
+            exception.Message,
+            isClient,
+            ex.EntityStateInfo?.ToString());
     }
     
     private async Task HandleNotFoundAsync(HttpContext httpContext, Exception exception) 
@@ -60,32 +77,20 @@ public class GlobalExceptionHandler: IExceptionHandler
             httpContext, 
             "Not found", 
             StatusCodes.Status404NotFound,
-            messageForClient: exception.Message);
+            message: exception.Message,
+            true);
 
-    private async Task HandleValidationAsync(HttpContext httpContext, Exception exception)
-    {
-        var ex = (ValidationException)exception;
-        if (ex.IsClientError)
-            await HandleAsync(
-                httpContext,
-                "Validation error",
-                StatusCodes.Status400BadRequest,
-                messageForClient: exception.Message,
-                additionalInfoForServer: ex.EntityStateInfo?.ToString());
-        else
-        {
-            await HandleAsync(
-                httpContext,
-                "Internal server error",
-                StatusCodes.Status500InternalServerError,
-                additionalInfoForServer: $"{ex.Message} {ex.EntityStateInfo}");
-        }
-    }
+    private async Task HandleServerValidationAsync(HttpContext httpContext, Exception exception)
+        => await HandleValidationAsync(httpContext, exception, false);
+    
+    private async Task HandleClientValidationAsync(HttpContext httpContext, Exception exception)
+        => await HandleValidationAsync(httpContext, exception, true);
     
     private async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
         => await HandleAsync(
             httpContext,
             "Internal server error", 
             StatusCodes.Status500InternalServerError,
-            additionalInfoForServer: exception.Message);
+            exception.Message,
+            false);
 }

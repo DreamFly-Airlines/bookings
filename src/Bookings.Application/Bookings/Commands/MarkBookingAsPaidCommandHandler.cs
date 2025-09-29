@@ -30,7 +30,7 @@ public class MarkBookingAsPaidCommandHandler(
             var state = new EntityStateInfo(nameof(Booking), 
                 (nameof(Booking.BookRef), booking.BookRef),
                 (nameof(Booking.Status), booking.Status.ToString()));
-            throw new ValidationException(ex.Message, true, state);
+            throw new ClientValidationException(ex.Message, state);
         }
     }
 }

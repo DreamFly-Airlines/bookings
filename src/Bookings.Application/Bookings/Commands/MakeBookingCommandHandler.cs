@@ -2,13 +2,13 @@
 using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Exceptions;
 using Bookings.Application.Bookings.Services;
+using Bookings.Domain.Bookings.Abstractions;
 using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.Exceptions;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
 using Microsoft.Extensions.Logging;
-using ValidationException = Bookings.Application.Bookings.Exceptions.ValidationException;
 
 namespace Bookings.Application.Bookings.Commands;
 
@@ -21,7 +21,7 @@ public class MakeBookingCommandHandler(
 {
     public async Task HandleAsync(MakeBookingCommand command, CancellationToken cancellationToken = default)
     {
-        var bookRef = BookRef.FromString(
+        var bookRef = TryFromStringOrThrow<BookRef>(
             generator.Generate(BookRef.BookRefLength, true, true));
         var ticketCost = await pricingService.CalculatePriceAsync(
             command.ItineraryFlightsIds, command.FareConditions, cancellationToken);
@@ -30,7 +30,7 @@ public class MakeBookingCommandHandler(
             {
                 try
                 {
-                    var ticketNo = TicketNo.FromString(
+                    var ticketNo = TryFromStringOrThrow<TicketNo>(
                         generator.Generate(TicketNo.TicketNoLength, true, false));
                     var email = string.IsNullOrEmpty(passengerInfo.ContactDataDto.Email)
                         ? (Email?)null
@@ -59,11 +59,25 @@ public class MakeBookingCommandHandler(
             nameof(Booking), nameof(BookRef), booking.BookRef);
     }
 
-    private ValidationException GetInvalidContactDataForPassengerException(string message, string? email, string? phoneNumber)
+    private static ClientValidationException GetInvalidContactDataForPassengerException(
+        string message, string? email, string? phoneNumber)
     {
         var state = new EntityStateInfo(nameof(ContactData),
             (nameof(Email), email ?? string.Empty),
             (nameof(PhoneNumber), phoneNumber ?? string.Empty));
-        return new ValidationException(message, true, state);
+        return new ClientValidationException(message, state);
+    }
+
+    private static T TryFromStringOrThrow<T>(string @string) where T : struct, IStringBackedData<T>
+    {
+        try
+        {
+            return T.FromString(@string);
+        }
+        catch (InvalidDataFormatException ex)
+        {
+            var state = new EntityStateInfo(typeof(T).Name, ("Value", @string));
+            throw new ServerValidationException(ex.Message, state);
+        }
     }
 }

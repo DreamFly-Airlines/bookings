@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Bookings.Application.Abstractions;
-using Bookings.Application.Bookings.Exceptions;
+﻿using Bookings.Application.Bookings.Exceptions;
 using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.Abstractions;
 using Bookings.Domain.Bookings.AggregateRoots;
@@ -9,6 +7,7 @@ using Bookings.Domain.Bookings.Exceptions;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
 using Microsoft.Extensions.Logging;
+using Shared.Abstractions.Commands;
 
 namespace Bookings.Application.Bookings.Commands;
 

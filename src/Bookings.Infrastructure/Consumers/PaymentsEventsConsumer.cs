@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Commands;
 using Bookings.Application.Payments.Enums;
 using Bookings.Application.Payments.IntegrationEvents;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Shared.Abstractions.Commands;
 
 namespace Bookings.Infrastructure.Consumers;
 

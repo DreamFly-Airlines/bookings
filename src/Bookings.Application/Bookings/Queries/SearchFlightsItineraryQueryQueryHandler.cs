@@ -1,6 +1,6 @@
-﻿using Bookings.Application.Abstractions;
-using Bookings.Application.Bookings.ReadModels.ReadModels;
+﻿using Bookings.Application.Bookings.ReadModels.ReadModels;
 using Bookings.Application.Bookings.Services;
+using Shared.Abstractions.Queries;
 
 namespace Bookings.Application.Bookings.Queries;
 

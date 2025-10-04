@@ -1,5 +1,5 @@
-﻿using Bookings.Application.Abstractions;
-using Bookings.Domain.Bookings.Events;
+﻿using Bookings.Domain.Bookings.Events;
+using Shared.Abstractions.Events;
 
 namespace Bookings.Application.Bookings.EventHandlers;
 

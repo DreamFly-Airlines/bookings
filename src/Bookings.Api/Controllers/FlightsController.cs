@@ -1,9 +1,9 @@
 ﻿using Bookings.Api.Dto;
-using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Commands;
 using Bookings.Application.Bookings.Queries;
-using Bookings.Domain.Bookings.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Abstractions.Commands;
+using Shared.Abstractions.Queries;
 
 namespace Bookings.Api.Controllers;
 

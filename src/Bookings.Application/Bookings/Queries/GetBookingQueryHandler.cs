@@ -1,8 +1,8 @@
-﻿using Bookings.Application.Abstractions;
-using Bookings.Application.Bookings.Exceptions;
+﻿using Bookings.Application.Bookings.Exceptions;
 using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
+using Shared.Abstractions.Queries;
 
 namespace Bookings.Application.Bookings.Queries;
 

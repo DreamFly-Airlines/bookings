@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
-using Bookings.Application.Abstractions;
 using Bookings.Infrastructure.Consumers;
-using Confluent.Kafka;
+using Shared.Abstractions.Queries;
 
 namespace Bookings.Api.Extensions;
 
@@ -13,23 +12,6 @@ public static class ServiceCollectionExtensions
     {
         var handlerInterfaceType = typeof(IQueryHandler<,>);
         services.FindImplementationsAndRegister(handlerInterfaceType, assembly);
-    }
-
-    public static void AddCommandHandlers(this IServiceCollection services, Assembly assembly)
-    {
-        var handlerInterfaceType = typeof(ICommandHandler<>);
-        services.FindImplementationsAndRegister(handlerInterfaceType, assembly);
-    }
-
-    public static void AddEventHandlers(this IServiceCollection services, Assembly assembly)
-    {
-        var handlersInfos = assembly.GetTypes()
-            .Where(t => t is { IsAbstract: false, IsInterface: false })
-            .SelectMany(t => t.GetInterfaces()
-                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEventHandler<>))
-                .Select(i => new { HandlerInterface = i, HandlerImplementation = t }));
-        foreach (var handlerInfo in handlersInfos)
-            services.AddScoped(handlerInfo.HandlerInterface, handlerInfo.HandlerImplementation);
     }
 
     public static void AddKafkaConsumers(this IServiceCollection services)

@@ -1,18 +1,21 @@
 using Bookings.Api.ExceptionHandling;
 using Bookings.Api.Extensions;
-using Bookings.Application.Abstractions;
 using Bookings.Application.Bookings.Commands;
 using Bookings.Application.Bookings.EventHandlers;
 using Bookings.Application.Bookings.Queries;
 using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.Repositories;
-using Bookings.Infrastructure.Commands;
 using Bookings.Infrastructure.Events;
 using Bookings.Infrastructure.Persistence;
-using Bookings.Infrastructure.Queries;
 using Bookings.Infrastructure.Repositories;
 using Bookings.Infrastructure.Serialization;
 using Bookings.Infrastructure.Services;
+using Shared.Abstractions.Commands;
+using Shared.Abstractions.Events;
+using Shared.Abstractions.Queries;
+using Shared.Extensions.ServiceCollection;
+using Shared.Infrastructure.Commands;
+using Shared.Infrastructure.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +33,7 @@ builder.Services.AddSingleton<IStringBackedDataGeneratorService, CryptographyStr
 
 builder.Services.AddQueryHandlers(typeof(SearchFlightsItineraryQueryQueryHandler).Assembly);
 builder.Services.AddCommandHandlers(typeof(MakeBookingCommandHandler).Assembly);
-builder.Services.AddEventHandlers(typeof(BookingCancelledEventHandler).Assembly);
+builder.Services.AddDomainEventHandlers(typeof(BookingCancelledEventHandler).Assembly);
 builder.Services.AddKafkaConsumers();
 
 builder.Services.AddEndpointsApiExplorer();

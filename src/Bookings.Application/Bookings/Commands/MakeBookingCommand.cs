@@ -1,7 +1,6 @@
-﻿using Bookings.Application.Abstractions;
-using Bookings.Application.Bookings.Dto;
+﻿using Bookings.Application.Bookings.Dto;
 using Bookings.Domain.Bookings.Enums;
-using Bookings.Domain.Bookings.ValueObjects;
+using Shared.Abstractions.Commands;
 
 namespace Bookings.Application.Bookings.Commands;
 

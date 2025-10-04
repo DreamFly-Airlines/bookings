@@ -1,5 +1,5 @@
-﻿using Bookings.Application.Abstractions;
-using Bookings.Domain.Bookings.ValueObjects;
+﻿using Bookings.Domain.Bookings.ValueObjects;
+using Shared.Abstractions.Commands;
 
 namespace Bookings.Application.Bookings.Commands;
 

@@ -1,9 +1,9 @@
-﻿using Bookings.Application.Abstractions;
-using Bookings.Domain.Bookings.AggregateRoots;
+﻿using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
 using Bookings.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Shared.Abstractions.Events;
 
 namespace Bookings.Infrastructure.Repositories;
 

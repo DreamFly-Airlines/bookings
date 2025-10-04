@@ -1,5 +1,5 @@
-﻿using Bookings.Application.Abstractions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Shared.Abstractions.Events;
 
 namespace Bookings.Infrastructure.Events;
 

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Bookings.Application.Bookings.Commands;
 using Bookings.Application.Payments.Enums;
 using Bookings.Application.Payments.IntegrationEvents;
@@ -16,9 +17,10 @@ namespace Bookings.Infrastructure.Consumers;
 public class PaymentsEventsConsumer : BackgroundService
 {
     private readonly ILogger<PaymentsEventsConsumer> _logger;
-    private readonly IConsumer<Ignore, string> _consumer;
+    private readonly Lazy<IConsumer<Ignore, string>> _consumer;
+    private readonly string _bootstrapServers;
     private readonly IServiceScopeFactory _scopeFactory;
-    
+
     private const string EventTypeHeader = "event-type";
     private const string PaymentsTopicName = "payments-events";
 
@@ -28,21 +30,24 @@ public class PaymentsEventsConsumer : BackgroundService
         IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
+        _scopeFactory = scopeFactory;
         var consumerConfig = new ConsumerConfig();
         configuration.GetSection("Kafka:PaymentsEvents:ConsumerSettings").Bind(consumerConfig);
-        _consumer = new ConsumerBuilder<Ignore, string>(consumerConfig).Build();
-        _scopeFactory = scopeFactory;
+        _bootstrapServers = consumerConfig.BootstrapServers;
+        _consumer = new(() => new ConsumerBuilder<Ignore, string>(consumerConfig).Build());
     }
-    
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await Task.Yield();
-        _consumer.Subscribe(PaymentsTopicName);
+        if (!CheckBrokersAndLog(_bootstrapServers))
+            return;
+        _consumer.Value.Subscribe(PaymentsTopicName);
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                var result = _consumer.Consume(stoppingToken);
+                var result = _consumer.Value.Consume(stoppingToken);
                 var eventTypeHeader = result.Message.Headers.FirstOrDefault(h => h.Key == EventTypeHeader);
                 if (eventTypeHeader is null)
                     throw new InvalidOperationException($"Missing header: {EventTypeHeader}");
@@ -90,8 +95,8 @@ public class PaymentsEventsConsumer : BackgroundService
     }
 
     private async Task SendCommandDependOnEventType(
-        PaymentEventType eventType, 
-        ICommandSender commandSender, 
+        PaymentEventType eventType,
+        ICommandSender commandSender,
         string jsonPayload,
         CancellationToken cancellationToken)
     {
@@ -107,5 +112,33 @@ public class PaymentsEventsConsumer : BackgroundService
         };
 
         await commandSender.SendAsync(command, cancellationToken);
+    }
+
+    private bool CheckBrokersAndLog(string bootstrapServers)
+    {
+        try
+        {
+            var config = new AdminClientConfig { BootstrapServers = bootstrapServers };
+            using var admin = new AdminClientBuilder(config).Build();
+            var metadata = admin.GetMetadata(TimeSpan.FromSeconds(2));
+            if (metadata.Brokers.Count == 0)
+            {
+                _logger.LogWarning("Found 0 Kafka brokers");
+                return false;
+            }
+            _logger.LogInformation("" +
+                                   "Found {BrokersCount} Kafka brokers. " +
+                                   "Ids: {BrokersIds}", 
+                metadata.Brokers.Count, string.Join(", ", metadata.Brokers.Select(b => b.BrokerId)));
+            return true;
+        }
+        catch (KafkaException ex)
+        {
+            _logger.LogWarning(
+                "{KafkaException} thrown. " +
+                "This is an expected behaviour if you are running without Docker/Kafka. " +
+                "Details: {Details}", nameof(KafkaException), ex.Message);
+            return false;
+        }
     }
 }

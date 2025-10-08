@@ -5,16 +5,18 @@ using Bookings.Application.Bookings.EventHandlers;
 using Bookings.Application.Bookings.Queries;
 using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.Repositories;
-using Bookings.Infrastructure.Events;
 using Bookings.Infrastructure.Persistence;
 using Bookings.Infrastructure.Repositories;
 using Bookings.Infrastructure.Serialization;
 using Bookings.Infrastructure.Services;
 using Shared.Abstractions.Commands;
 using Shared.Abstractions.Events;
+using Shared.Abstractions.IntegrationEvents;
 using Shared.Abstractions.Queries;
 using Shared.Extensions.ServiceCollection;
 using Shared.Infrastructure.Commands;
+using Shared.Infrastructure.Events;
+using Shared.Infrastructure.IntegrationEvents;
 using Shared.Infrastructure.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +25,8 @@ builder.Services.AddNpgsql<BookingsDbContext>(builder.Configuration.GetConnectio
 
 builder.Services.AddScoped<IQuerySender, ServiceProviderQuerySender>();
 builder.Services.AddScoped<ICommandSender, ServiceProviderCommandSender>();
-builder.Services.AddScoped<IEventPublisher, ServiceProviderEventsPublisher>();
+builder.Services.AddScoped<IEventPublisher, ServiceProviderEventPublisher>();
+builder.Services.AddScoped<IIntegrationEventPublisher, ServiceProviderIntegrationEventPublisher>();
 builder.Services.AddScoped<IFlightSearchingService, SqlFlightSearchingService>();
 // builder.Services.AddScoped<IBookingRepository, SqlBookingRepository>();
 builder.Services.AddSingleton<IBookingRepository, InMemoryBookingRepository>();

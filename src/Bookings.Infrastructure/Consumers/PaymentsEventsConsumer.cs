@@ -1,8 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Bookings.Application.Bookings.Commands;
-using Bookings.Application.Payments.Enums;
-using Bookings.Application.Payments.IntegrationEvents;
 using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.ValueObjects;
 using Confluent.Kafka;
@@ -11,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shared.Abstractions.Commands;
+using Shared.IntegrationEvents.Kafka;
+using Shared.IntegrationEvents.Payments;
 
 namespace Bookings.Infrastructure.Consumers;
 
@@ -20,9 +19,7 @@ public class PaymentsEventsConsumer : BackgroundService
     private readonly Lazy<IConsumer<Ignore, string>> _consumer;
     private readonly string _bootstrapServers;
     private readonly IServiceScopeFactory _scopeFactory;
-
-    private const string EventTypeHeader = "event-type";
-    private const string PaymentsTopicName = "payments-events";
+    private readonly Dictionary<string, Func<string, ICommandSender, CancellationToken, Task>> _handlers;
 
     public PaymentsEventsConsumer(
         ILogger<PaymentsEventsConsumer> logger,
@@ -35,6 +32,11 @@ public class PaymentsEventsConsumer : BackgroundService
         configuration.GetSection("Kafka:PaymentsEvents:ConsumerSettings").Bind(consumerConfig);
         _bootstrapServers = consumerConfig.BootstrapServers;
         _consumer = new(() => new ConsumerBuilder<Ignore, string>(consumerConfig).Build());
+        _handlers = new()
+        {
+            { PaymentConfirmedIntegrationEvent.EventName, HandleConfirmedAsync },
+            { PaymentCancelledIntegrationEvent.EventName, HandleCancelledAsync }
+        };
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -42,25 +44,23 @@ public class PaymentsEventsConsumer : BackgroundService
         await Task.Yield();
         if (!CheckBrokersAndLog(_bootstrapServers))
             return;
-        _consumer.Value.Subscribe(PaymentsTopicName);
+        _consumer.Value.Subscribe(KafkaTopics.PaymentsEvents);
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
                 var result = _consumer.Value.Consume(stoppingToken);
-                var eventTypeHeader = result.Message.Headers.FirstOrDefault(h => h.Key == EventTypeHeader);
+                var eventTypeHeader = result.Message.Headers.FirstOrDefault(h => h.Key == KafkaHeaders.EventType);
                 if (eventTypeHeader is null)
-                    throw new InvalidOperationException($"Missing header: {EventTypeHeader}");
-                var stringEventType = eventTypeHeader.GetValueBytes() is { } bytes
-                    ? System.Text.Encoding.UTF8.GetString(bytes)
-                    : null;
+                    throw new InvalidOperationException($"Missing header: {KafkaHeaders.EventType}");
+                var eventType = System.Text.Encoding.UTF8.GetString(eventTypeHeader.GetValueBytes())
+                    ?? throw new InvalidOperationException($"Missing header value: {KafkaHeaders.EventType}");
                 _logger.LogInformation(
                     $"Got event \"{eventTypeHeader}\" for {nameof(Booking)} with {nameof(BookRef)} " +
                     $"\"{result.Message.Value}\".");
-                var eventType = GetEventTypeOrThrow(stringEventType);
                 using var scope = _scopeFactory.CreateScope();
                 var commandSender = scope.ServiceProvider.GetRequiredService<ICommandSender>();
-                await SendCommandDependOnEventType(eventType, commandSender, result.Message.Value, stoppingToken);
+                await _handlers[eventType](result.Message.Value, commandSender, stoppingToken);
             }
             catch (FormatException e)
             {
@@ -81,36 +81,19 @@ public class PaymentsEventsConsumer : BackgroundService
         }
     }
 
-    private static PaymentEventType GetEventTypeOrThrow(string? stringEventType)
+    private static async Task HandleConfirmedAsync(
+        string jsonEvent, ICommandSender commandSender, CancellationToken cancellationToken = default)
     {
-        if (!Enum.TryParse<PaymentEventType>(stringEventType, out var eventType))
-        {
-            var supportedEventTypes = Enum.GetNames<PaymentEventType>();
-            throw new ArgumentException(
-                $"Unknown event type. " +
-                $"Supported event types: {string.Join(", ", supportedEventTypes)}.");
-        }
-
-        return eventType;
+        var command = new MarkBookingAsPaidCommand(BookRef.FromString(
+            JsonSerializer.Deserialize<PaymentConfirmedIntegrationEvent>(jsonEvent)!.BookRef));
+        await commandSender.SendAsync(command, cancellationToken);
     }
-
-    private async Task SendCommandDependOnEventType(
-        PaymentEventType eventType,
-        ICommandSender commandSender,
-        string jsonPayload,
-        CancellationToken cancellationToken)
+    
+    private static async Task HandleCancelledAsync(
+        string jsonEvent, ICommandSender commandSender, CancellationToken cancellationToken = default)
     {
-        var command = eventType switch
-        {
-            PaymentEventType.PaymentConfirmed =>
-                (ICommand)new MarkBookingAsPaidCommand(BookRef.FromString(
-                    JsonSerializer.Deserialize<PaymentConfirmedIntegrationEvent>(jsonPayload)!.BookRef)),
-            PaymentEventType.PaymentCancelled =>
-                new CancelBookingCommand(BookRef.FromString(
-                    JsonSerializer.Deserialize<PaymentCancelledIntegrationEvent>(jsonPayload)!.BookRef)),
-            _ => throw new ArgumentOutOfRangeException(nameof(eventType), eventType, null)
-        };
-
+        var command = new CancelBookingCommand(BookRef.FromString(
+            JsonSerializer.Deserialize<PaymentConfirmedIntegrationEvent>(jsonEvent)!.BookRef));
         await commandSender.SendAsync(command, cancellationToken);
     }
 

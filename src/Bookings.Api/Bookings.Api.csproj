@@ -16,9 +16,9 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.4" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-        <PackageReference Include="Shared.Abstractions" Version="1.0.0" />
+        <PackageReference Include="Shared.Abstractions" Version="3.0.1" />
         <PackageReference Include="Shared.Extensions" Version="1.0.0" />
-        <PackageReference Include="Shared.Infrastructure" Version="1.0.0" />
+        <PackageReference Include="Shared.Infrastructure" Version="1.1.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
     </ItemGroup>
 

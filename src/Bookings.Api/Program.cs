@@ -18,6 +18,7 @@ using Shared.Infrastructure.Commands;
 using Shared.Infrastructure.Events;
 using Shared.Infrastructure.IntegrationEvents;
 using Shared.Infrastructure.Queries;
+using Shared.IntegrationEvents.Payments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +38,7 @@ builder.Services.AddSingleton<IStringBackedDataGeneratorService, CryptographyStr
 builder.Services.AddQueryHandlers(typeof(SearchFlightsItineraryQueryQueryHandler).Assembly);
 builder.Services.AddCommandHandlers(typeof(MakeBookingCommandHandler).Assembly);
 builder.Services.AddDomainEventHandlers(typeof(BookingCancelledEventHandler).Assembly);
-// TODO: register integration event handlers
+builder.Services.AddIntegrationEventHandlers(typeof(PaymentCancelledIntegrationEvent).Assembly);
 builder.Services.AddKafkaConsumers();
 
 builder.Services.AddEndpointsApiExplorer();

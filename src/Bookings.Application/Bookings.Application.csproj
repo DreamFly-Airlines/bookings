@@ -13,6 +13,7 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
       <PackageReference Include="Shared.Abstractions" Version="3.0.1" />
+      <PackageReference Include="Shared.IntegrationEvents" Version="2.0.1" />
     </ItemGroup>
 
 </Project>

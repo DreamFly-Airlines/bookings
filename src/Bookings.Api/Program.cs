@@ -37,6 +37,7 @@ builder.Services.AddSingleton<IStringBackedDataGeneratorService, CryptographyStr
 builder.Services.AddQueryHandlers(typeof(SearchFlightsItineraryQueryQueryHandler).Assembly);
 builder.Services.AddCommandHandlers(typeof(MakeBookingCommandHandler).Assembly);
 builder.Services.AddDomainEventHandlers(typeof(BookingCancelledEventHandler).Assembly);
+// TODO: register integration event handlers
 builder.Services.AddKafkaConsumers();
 
 builder.Services.AddEndpointsApiExplorer();

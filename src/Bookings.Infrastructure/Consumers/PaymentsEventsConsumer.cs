@@ -1,5 +1,5 @@
-﻿using System.Text.Json;
-using Bookings.Application.Bookings.Commands;
+﻿using System.Runtime.Serialization;
+using System.Text.Json;
 using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.ValueObjects;
 using Confluent.Kafka;
@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Shared.Abstractions.Commands;
+using Shared.Abstractions.IntegrationEvents;
 using Shared.IntegrationEvents.Kafka;
 using Shared.IntegrationEvents.Payments;
 
@@ -19,7 +19,7 @@ public class PaymentsEventsConsumer : BackgroundService
     private readonly Lazy<IConsumer<Ignore, string>> _consumer;
     private readonly string _bootstrapServers;
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly Dictionary<string, Func<string, ICommandSender, CancellationToken, Task>> _handlers;
+    private readonly Dictionary<string, Type> _eventTypeMap;
 
     public PaymentsEventsConsumer(
         ILogger<PaymentsEventsConsumer> logger,
@@ -32,10 +32,10 @@ public class PaymentsEventsConsumer : BackgroundService
         configuration.GetSection("Kafka:PaymentsEvents:ConsumerSettings").Bind(consumerConfig);
         _bootstrapServers = consumerConfig.BootstrapServers;
         _consumer = new(() => new ConsumerBuilder<Ignore, string>(consumerConfig).Build());
-        _handlers = new()
+        _eventTypeMap = new()
         {
-            { PaymentConfirmedIntegrationEvent.EventName, HandleConfirmedAsync },
-            { PaymentCancelledIntegrationEvent.EventName, HandleCancelledAsync }
+            { PaymentCancelledIntegrationEvent.EventName, typeof(PaymentCancelledIntegrationEvent) },
+            { PaymentConfirmedIntegrationEvent.EventName, typeof(PaymentCancelledIntegrationEvent) }
         };
     }
 
@@ -50,21 +50,20 @@ public class PaymentsEventsConsumer : BackgroundService
             try
             {
                 var result = _consumer.Value.Consume(stoppingToken);
-                var eventTypeHeader = result.Message.Headers.FirstOrDefault(h => h.Key == KafkaHeaders.EventType);
-                if (eventTypeHeader is null)
+                var eventNameHeader = result.Message.Headers.FirstOrDefault(h => h.Key == KafkaHeaders.EventType);
+                if (eventNameHeader is null)
                     throw new InvalidOperationException($"Missing header: {KafkaHeaders.EventType}");
-                var eventType = System.Text.Encoding.UTF8.GetString(eventTypeHeader.GetValueBytes())
+                var eventName = System.Text.Encoding.UTF8.GetString(eventNameHeader.GetValueBytes())
                     ?? throw new InvalidOperationException($"Missing header value: {KafkaHeaders.EventType}");
                 _logger.LogInformation(
-                    $"Got event \"{eventTypeHeader}\" for {nameof(Booking)} with {nameof(BookRef)} " +
+                    $"Got event \"{eventNameHeader}\" for {nameof(Booking)} with {nameof(BookRef)} " +
                     $"\"{result.Message.Value}\".");
                 using var scope = _scopeFactory.CreateScope();
-                var commandSender = scope.ServiceProvider.GetRequiredService<ICommandSender>();
-                await _handlers[eventType](result.Message.Value, commandSender, stoppingToken);
-            }
-            catch (FormatException e)
-            {
-                _logger.LogError("{ErrorMessage}", e.Message);
+                await HandleIntegrationEventAsyncOrThrow(
+                    scope.ServiceProvider,
+                    eventName,
+                    result.Message.Value,
+                    stoppingToken);
             }
             catch (ConsumeException e)
             {
@@ -78,23 +77,46 @@ public class PaymentsEventsConsumer : BackgroundService
             {
                 _logger.LogCritical("{ErrorMessage}", e.Message);
             }
+            catch (MissingMethodException e)
+            {
+                _logger.LogCritical("{ErrorMessage}", e.Message);
+            }
+            catch (SerializationException e)
+            {
+                _logger.LogCritical("{ErrorMessage}", e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("{ErrorMessage}", e.Message);
+            }
         }
     }
 
-    private static async Task HandleConfirmedAsync(
-        string jsonEvent, ICommandSender commandSender, CancellationToken cancellationToken = default)
+    private async Task HandleIntegrationEventAsyncOrThrow(
+        IServiceProvider serviceProvider, 
+        string eventName, 
+        string eventJson,
+        CancellationToken cancellationToken = default)
     {
-        var command = new MarkBookingAsPaidCommand(BookRef.FromString(
-            JsonSerializer.Deserialize<PaymentConfirmedIntegrationEvent>(jsonEvent)!.BookRef));
-        await commandSender.SendAsync(command, cancellationToken);
-    }
-    
-    private static async Task HandleCancelledAsync(
-        string jsonEvent, ICommandSender commandSender, CancellationToken cancellationToken = default)
-    {
-        var command = new CancelBookingCommand(BookRef.FromString(
-            JsonSerializer.Deserialize<PaymentConfirmedIntegrationEvent>(jsonEvent)!.BookRef));
-        await commandSender.SendAsync(command, cancellationToken);
+        var type = _eventTypeMap[eventName];
+        var @event = JsonSerializer.Deserialize(eventJson, type) 
+                     ?? throw new SerializationException(
+                         $"Failed to deserialize event with {nameof(eventName)} \"{eventName}\": {eventJson}");
+        var handlerType = typeof(IIntegrationEventHandler<>).MakeGenericType(type);
+        
+        const string handleMethodName = nameof(IIntegrationEventHandler<PaymentCancelledIntegrationEvent>.HandleAsync);
+        var handleMethodInfo = handlerType.GetMethod(handleMethodName)
+                               ?? throw new MissingMethodException($"Method {handleMethodName} is missing");
+
+        var atLeastOneHandlerFound = false;
+        foreach (var handler in serviceProvider.GetServices(handlerType))
+        {
+            atLeastOneHandlerFound = true;
+            await (Task)handleMethodInfo.Invoke(handler, [@event, cancellationToken])!;
+        }
+
+        if (!atLeastOneHandlerFound)
+            throw new Exception($"No handlers for event with {nameof(eventName)} \"{eventName}\" were found");
     }
 
     private bool CheckBrokersAndLog(string bootstrapServers)

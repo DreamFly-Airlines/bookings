@@ -1,3 +1,6 @@
+using System.Security.Claims;
+using System.Text;
+using Bookings.Api.Authorization;
 using Bookings.Api.ExceptionHandling;
 using Bookings.Api.Extensions;
 using Bookings.Application.Bookings.Commands;
@@ -9,6 +12,8 @@ using Bookings.Infrastructure.Persistence;
 using Bookings.Infrastructure.Repositories;
 using Bookings.Infrastructure.Serialization;
 using Bookings.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Shared.Abstractions.Commands;
 using Shared.Abstractions.Events;
 using Shared.Abstractions.IntegrationEvents;
@@ -42,7 +47,7 @@ builder.Services.AddIntegrationEventHandlers(typeof(PaymentCancelledIntegrationE
 builder.Services.AddKafkaConsumers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGenWithJwtAuthentication();
 
 builder.Services.AddControllers()
     .AddJsonOptions(opts =>
@@ -52,6 +57,9 @@ builder.Services.AddControllers()
     });
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+builder.Services.AddAuthenticationWithJwt(builder.Configuration);
+builder.Services.AddAuthorizationWithPolicies();
 
 var app = builder.Build();
 
@@ -65,5 +73,8 @@ app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 app.MapControllers();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();

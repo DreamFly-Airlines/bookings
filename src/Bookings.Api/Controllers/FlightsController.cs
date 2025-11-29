@@ -1,6 +1,8 @@
-﻿using Bookings.Api.Dto;
+﻿using Bookings.Api.Authorization;
+using Bookings.Api.Dto;
 using Bookings.Application.Bookings.Commands;
 using Bookings.Application.Bookings.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Abstractions.Commands;
 using Shared.Abstractions.Queries;
@@ -26,6 +28,7 @@ public class FlightsController(
     }
 
     [HttpPost("book")]
+    [Authorize(Policy = Policies.HasNameIdentifier)]
     public async Task<IActionResult> MakeBooking([FromBody] MakeBookingRequest request)
     {
         var bookCommand = new MakeBookingCommand(

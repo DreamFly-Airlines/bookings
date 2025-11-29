@@ -1,12 +1,72 @@
-﻿using Bookings.Infrastructure.Consumers;
+﻿using System.Security.Claims;
+using System.Text;
+using Bookings.Api.Authorization;
+using Bookings.Infrastructure.Consumers;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace Bookings.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-
     public static void AddKafkaConsumers(this IServiceCollection services)
     {
         services.AddHostedService<PaymentsEventsConsumer>();
+    }
+    
+    public static void AddAuthenticationWithJwt(this IServiceCollection services, IConfiguration configuration)
+    {
+        const string jwtOptionsConfigurationKey = "JwtOptions:Key";
+        services
+            .AddAuthentication()
+            .AddJwtBearer(options =>
+            {
+                var key = configuration[jwtOptionsConfigurationKey] 
+                          ?? throw new ArgumentNullException(jwtOptionsConfigurationKey);
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+                };
+            });
+    }
+
+    public static void AddSwaggerGenWithJwtAuthentication(this IServiceCollection services)
+    {
+        const string securityName = "Bearer";
+        const string schemeName = "bearer";
+        const string tokenTypeName = "JWT";
+        services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition(securityName, new OpenApiSecurityScheme
+            {
+                Description = $"{tokenTypeName} Authorization header using the {schemeName} scheme.",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = schemeName,
+                BearerFormat = tokenTypeName
+            });
+
+            var securityRequirement = new OpenApiSecurityRequirement();
+            var securityScheme = new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme, Id = securityName
+                }
+            };
+            securityRequirement[securityScheme] = [];
+            options.AddSecurityRequirement(securityRequirement);
+        });
+    }
+
+    public static void AddAuthorizationWithPolicies(this IServiceCollection services)
+    {
+        services.AddAuthorizationBuilder()
+            .AddPolicy(Policies.HasNameIdentifier, policy => policy.RequireClaim(ClaimTypes.NameIdentifier));
     }
 }

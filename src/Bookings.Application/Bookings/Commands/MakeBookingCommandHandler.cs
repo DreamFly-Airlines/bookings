@@ -16,9 +16,9 @@ public class MakeBookingCommandHandler(
     IItineraryPricingService pricingService,
     IClockService clockService,
     IBookingRepository bookingRepository,
-    IStringBackedDataGeneratorService generator) : ICommandHandler<MakeBookingCommand>
+    IStringBackedDataGeneratorService generator) : ICommandHandler<MakeBookingCommand, BookRef>
 {
-    public async Task HandleAsync(MakeBookingCommand command, CancellationToken cancellationToken = default)
+    public async Task<BookRef> HandleAsync(MakeBookingCommand command, CancellationToken cancellationToken = default)
     {
         var bookRef = TryFromStringOrThrow<BookRef>(
             generator.Generate(BookRef.BookRefLength, true, true));
@@ -56,6 +56,7 @@ public class MakeBookingCommandHandler(
         logger.LogInformation(
             "{nameofBooking} with {nameofBookRef} \"{BookingBookRef}\" created",
             nameof(Booking), nameof(BookRef), booking.BookRef);
+        return bookRef;
     }
 
     private static ClientValidationException GetInvalidContactDataForPassengerException(

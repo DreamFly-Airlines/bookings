@@ -13,7 +13,7 @@ public class BookingsController(IQuerySender querySender) : Controller
 {
     [HttpGet("{bookRef}")]
     [Authorize(Policy = Policies.HasNameIdentifier)]
-    public async Task<IActionResult> GetBooking([FromQuery] string bookRef)
+    public async Task<IActionResult> GetBooking([FromRoute] string bookRef)
     {
         var parsedBookRef = BookRef.FromString(bookRef);
         var query = new GetBookingQuery(parsedBookRef);

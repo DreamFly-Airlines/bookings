@@ -35,7 +35,11 @@ public class FlightsController(
             request.ItineraryFlightsIds, 
             request.PassengersInfos, 
             request.FareConditions);
-        await commandSender.SendAsync(bookCommand);
-        return Created();
+        var bookRef = await commandSender.SendAsync(bookCommand);
+        return CreatedAtAction(
+            actionName: nameof(BookingsController.GetBooking),
+            controllerName: "Bookings",
+            new { bookRef },
+            bookRef);
     }
 }

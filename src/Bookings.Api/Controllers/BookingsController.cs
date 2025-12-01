@@ -1,4 +1,5 @@
-﻿using Bookings.Api.Authorization;
+﻿using System.Security.Claims;
+using Bookings.Api.Authorization;
 using Bookings.Application.Bookings.Queries;
 using Bookings.Domain.Bookings.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
@@ -19,5 +20,15 @@ public class BookingsController(IQuerySender querySender) : Controller
         var query = new GetBookingQuery(parsedBookRef);
         var booking = await querySender.SendAsync(query);
         return Ok(booking);
+    }
+
+    [HttpGet]
+    [Authorize(Policy = Policies.HasNameIdentifier)]
+    public async Task<IActionResult> GetBookings()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var query = new GetBookingsQuery(userId);
+        var bookings = await querySender.SendAsync(query);
+        return Ok(bookings);
     }
 }

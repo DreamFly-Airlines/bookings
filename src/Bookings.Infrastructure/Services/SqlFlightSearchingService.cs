@@ -1,4 +1,4 @@
-﻿using Bookings.Application.Bookings.ReadModels.ReadModels;
+﻿using Bookings.Application.Bookings.ReadModels;
 using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.Enums;
 using Bookings.Infrastructure.Persistence;

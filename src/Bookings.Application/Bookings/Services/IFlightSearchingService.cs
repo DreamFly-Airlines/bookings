@@ -1,4 +1,4 @@
-﻿using Bookings.Application.Bookings.ReadModels.ReadModels;
+﻿using Bookings.Application.Bookings.ReadModels;
 
 namespace Bookings.Application.Bookings.Services;
 

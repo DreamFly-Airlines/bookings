@@ -1,19 +1,15 @@
-using System.Security.Claims;
-using System.Text;
-using Bookings.Api.Authorization;
 using Bookings.Api.ExceptionHandling;
 using Bookings.Api.Extensions;
 using Bookings.Application.Bookings.Commands;
 using Bookings.Application.Bookings.EventHandlers;
 using Bookings.Application.Bookings.Queries;
+using Bookings.Application.Bookings.Repositories;
 using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Infrastructure.Persistence;
 using Bookings.Infrastructure.Repositories;
 using Bookings.Infrastructure.Serialization;
 using Bookings.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Shared.Abstractions.Commands;
 using Shared.Abstractions.Events;
 using Shared.Abstractions.IntegrationEvents;
@@ -27,15 +23,18 @@ using Shared.IntegrationEvents.Payments;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddNpgsql<BookingsDbContext>(builder.Configuration.GetConnectionString("BookingsDb"));
+builder.Services.AddNpgsql<BookingsDbContext>(
+    builder.Configuration.GetConnectionString("BookingsDb"), 
+    o => o.CommandTimeout(180));
 
 builder.Services.AddScoped<IQuerySender, ServiceProviderQuerySender>();
 builder.Services.AddScoped<ICommandSender, ServiceProviderCommandSender>();
 builder.Services.AddScoped<IEventPublisher, ServiceProviderEventPublisher>();
 builder.Services.AddScoped<IIntegrationEventPublisher, ServiceProviderIntegrationEventPublisher>();
 builder.Services.AddScoped<IFlightSearchingService, SqlFlightSearchingService>();
-// builder.Services.AddScoped<IBookingRepository, SqlBookingRepository>();
-builder.Services.AddSingleton<IBookingRepository, InMemoryBookingRepository>();
+builder.Services.AddScoped<IBookingRepository, SqlBookingRepository>();
+builder.Services.AddScoped<IBookingReadModelRepository, SqlBookingReadModelRepository>();
+// builder.Services.AddSingleton<IBookingRepository, InMemoryBookingRepository>();
 builder.Services.AddScoped<IClockService, SqlClockService>();
 builder.Services.AddScoped<IItineraryPricingService, MockItineraryPricingService>();
 builder.Services.AddSingleton<IStringBackedDataGeneratorService, CryptographyStringBackedDataGeneratorService>();

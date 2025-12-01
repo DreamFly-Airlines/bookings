@@ -1,5 +1,4 @@
 ﻿using Bookings.Application.Bookings.ReadModels;
-using Bookings.Application.Bookings.ReadModels.ReadModels;
 using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.Enums;
@@ -145,6 +144,9 @@ public partial class BookingsDbContext : DbContext
 
             entity.ToTable("bookings", bookingsSchemaName, tb => tb.HasComment("Bookings"));
 
+            entity.Property(e => e.CreatorId)
+                .HasComment("User that made the booking")
+                .HasColumnName("creator_id");
             entity.Property(e => e.BookRef)
                 .HasConversion(new StringBackedDataConverter<BookRef>())
                 .HasMaxLength(6)

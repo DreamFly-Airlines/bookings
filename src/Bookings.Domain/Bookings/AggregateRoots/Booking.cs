@@ -10,6 +10,7 @@ namespace Bookings.Domain.Bookings.AggregateRoots;
 
 public class Booking : AggregateRoot<IDomainEvent>
 {
+    public string CreatorId { get; }
     public BookRef BookRef { get; }
     public DateTime BookDate { get; }
     public decimal TotalAmount { get; private set; }
@@ -20,6 +21,7 @@ public class Booking : AggregateRoot<IDomainEvent>
     private readonly HashSet<Ticket> _tickets;
     
     public Booking(
+        string creatorId,
         BookRef bookRef, 
         DateTime bookDate,
         FareConditions fareConditions,
@@ -29,6 +31,7 @@ public class Booking : AggregateRoot<IDomainEvent>
             decimal TicketCost, 
             Passenger Passenger)> passengersTicketsInfo)
     {
+        CreatorId = creatorId;
         BookRef = bookRef;
         BookDate = bookDate;
         TotalAmount = 0;

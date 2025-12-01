@@ -51,7 +51,8 @@ public class MakeBookingCommandHandler(
                 }
             });
         var bookDate = await clockService.NowAsync(cancellationToken);
-        var booking = new Booking(bookRef, bookDate, command.FareConditions, command.ItineraryFlightsIds, ticketsInfo);
+        var booking = new Booking(
+            command.CreatorId, bookRef, bookDate, command.FareConditions, command.ItineraryFlightsIds, ticketsInfo);
         await bookingRepository.AddAsync(booking, cancellationToken);
         logger.LogInformation(
             "{nameofBooking} with {nameofBookRef} \"{BookingBookRef}\" created",

@@ -1,4 +1,5 @@
-﻿using Bookings.Api.Authorization;
+﻿using System.Security.Claims;
+using Bookings.Api.Authorization;
 using Bookings.Api.Dto;
 using Bookings.Application.Bookings.Commands;
 using Bookings.Application.Bookings.Queries;
@@ -31,7 +32,9 @@ public class FlightsController(
     [Authorize(Policy = Policies.HasNameIdentifier)]
     public async Task<IActionResult> MakeBooking([FromBody] MakeBookingRequest request)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var bookCommand = new MakeBookingCommand(
+            userId,
             request.ItineraryFlightsIds, 
             request.PassengersInfos, 
             request.FareConditions);

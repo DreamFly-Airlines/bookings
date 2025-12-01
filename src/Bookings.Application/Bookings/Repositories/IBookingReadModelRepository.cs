@@ -4,6 +4,6 @@ namespace Bookings.Application.Bookings.Repositories;
 
 public interface IBookingReadModelRepository
 {
-    public Task<List<BookingReadModel>> GetBookingsForPassengerAsync(
-        string passengerId, CancellationToken cancellationToken = default);
+    public Task<List<BookingReadModel>> GetBookingsForUserAsync(
+        string userId, CancellationToken cancellationToken = default);
 }

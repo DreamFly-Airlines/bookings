@@ -9,6 +9,6 @@ public class GetBookingsQueryHandler(
 {
     public async Task<List<BookingReadModel>> HandleAsync(GetBookingsQuery query, CancellationToken cancellationToken = new CancellationToken())
     {
-        return await bookingReadModelRepository.GetBookingsForPassengerAsync(query.UserId, cancellationToken);
+        return await bookingReadModelRepository.GetBookingsForUserAsync(query.UserId, cancellationToken);
     }
 }

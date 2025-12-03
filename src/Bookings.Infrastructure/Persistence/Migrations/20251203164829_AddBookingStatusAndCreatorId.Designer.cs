@@ -13,8 +13,8 @@ using NpgsqlTypes;
 namespace Bookings.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(BookingsDbContext))]
-    [Migration("20250923055626_AddBookingStatus")]
-    partial class AddBookingStatus
+    [Migration("20251203164829_AddBookingStatusAndCreatorId")]
+    partial class AddBookingStatusAndCreatorId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,10 +24,9 @@ namespace Bookings.Infrastructure.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "bookings", "booking_status", new[] { "paid", "pending", "cancelled" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Bookings.Application.Bookings.ReadModels.ReadModels.FlightReadModel", b =>
+            modelBuilder.Entity("Bookings.Application.Bookings.ReadModels.FlightReadModel", b =>
                 {
                     b.Property<DateTime?>("ActualArrival")
                         .HasColumnType("timestamp with time zone")
@@ -166,8 +165,15 @@ namespace Bookings.Infrastructure.Persistence.Migrations
                         .HasColumnName("book_date")
                         .HasComment("Booking date");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("booking_status")
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("creator_id")
+                        .HasComment("User that made the booking");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("status")
                         .HasComment("Booking status");
 

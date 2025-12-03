@@ -5,7 +5,7 @@
 namespace Bookings.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCreatorIdToBooking : Migration
+    public partial class AddBookingStatusAndCreatorId : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +30,15 @@ namespace Bookings.Infrastructure.Persistence.Migrations
                 type: "text",
                 nullable: false,
                 comment: "User that made the booking");
+
+            migrationBuilder.AddColumn<string>(
+                name: "status",
+                schema: "bookings",
+                table: "bookings",
+                type: "text",
+                nullable: false,
+                defaultValue: "Paid",
+                comment: "Booking status");
         }
 
         /// <inheritdoc />
@@ -37,6 +46,11 @@ namespace Bookings.Infrastructure.Persistence.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "creator_id",
+                schema: "bookings",
+                table: "bookings");
+
+            migrationBuilder.DropColumn(
+                name: "status",
                 schema: "bookings",
                 table: "bookings");
         }

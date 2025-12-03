@@ -21,7 +21,6 @@ namespace Bookings.Infrastructure.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "bookings", "booking_status", new[] { "paid", "pending", "cancelled" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Bookings.Application.Bookings.ReadModels.FlightReadModel", b =>
@@ -169,8 +168,9 @@ namespace Bookings.Infrastructure.Persistence.Migrations
                         .HasColumnName("creator_id")
                         .HasComment("User that made the booking");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("booking_status")
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("status")
                         .HasComment("Booking status");
 

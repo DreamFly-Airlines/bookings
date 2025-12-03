@@ -132,17 +132,12 @@ public partial class BookingsDbContext : DbContext
                 .HasConstraintName("boarding_passes_ticket_no_fkey");
         });
 
-        const string bookingsSchemaName = "bookings";
-        const string bookingsStatusEnumName = "booking_status";
-        modelBuilder.HasPostgresEnum<BookingStatus>(
-            schema: bookingsSchemaName, 
-            name: bookingsStatusEnumName);
         modelBuilder.Entity<Booking>(entity =>
         {
             entity.HasKey(e => e.BookRef)
                 .HasName("bookings_pkey");
 
-            entity.ToTable("bookings", bookingsSchemaName, tb => tb.HasComment("Bookings"));
+            entity.ToTable("bookings", "bookings", tb => tb.HasComment("Bookings"));
 
             entity.Property(e => e.CreatorId)
                 .HasComment("User that made the booking")
@@ -162,7 +157,7 @@ public partial class BookingsDbContext : DbContext
                 .HasColumnName("total_amount");
             entity.Property(e => e.Status)
                 .HasColumnName("status")
-                .HasColumnType(bookingsStatusEnumName)
+                .HasConversion(new BookingStatusConverter())
                 .HasComment("Booking status");
         });
 

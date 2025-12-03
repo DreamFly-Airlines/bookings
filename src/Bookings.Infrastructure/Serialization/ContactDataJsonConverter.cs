@@ -6,7 +6,7 @@ namespace Bookings.Infrastructure.Serialization;
 
 public class ContactDataJsonConverter : JsonConverter<ContactData>
 {
-    private const string PhoneNumberName = "phoneNumber";
+    private const string PhoneNumberName = "phone";
     private const string EmailName = "email";
     
     public override ContactData Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

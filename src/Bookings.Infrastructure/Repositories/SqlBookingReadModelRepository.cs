@@ -16,6 +16,8 @@ public class SqlBookingReadModelRepository(BookingsDbContext dbContext) : IBooki
         var bookings = await dbContext.Bookings
             .AsNoTracking()
             .Where(b => b.CreatorId == userId)
+            .Include(b => b.Tickets)
+            .ThenInclude(t => t.TicketFlights)
             .ToListAsync(cancellationToken);
 
         // TODO: Distinct() may be unnecessary because all tickets within a booking are the same

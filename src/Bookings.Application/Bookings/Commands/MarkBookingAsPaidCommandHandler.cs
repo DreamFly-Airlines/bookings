@@ -1,4 +1,5 @@
 ﻿using Bookings.Application.Bookings.Exceptions;
+using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.AggregateRoots;
 using Bookings.Domain.Bookings.Exceptions;
 using Bookings.Domain.Bookings.Repositories;
@@ -9,6 +10,7 @@ using Shared.Abstractions.Commands;
 namespace Bookings.Application.Bookings.Commands;
 
 public class MarkBookingAsPaidCommandHandler(
+    IClockService clockService,
     ILogger<MarkBookingAsPaidCommandHandler> logger,
     IBookingRepository bookingRepository) : ICommandHandler<MarkBookingAsPaidCommand>
 {
@@ -19,7 +21,7 @@ public class MarkBookingAsPaidCommandHandler(
             throw new NotFoundException(nameof(Booking),  command.BookRef, idName: nameof(BookRef));
         try
         {
-            booking.MarkAsPaid();
+            booking.MarkAsPaid(await clockService.NowAsync(cancellationToken));
             await bookingRepository.SaveChangesAsync(booking, cancellationToken);
             logger.LogInformation(
                 "{nameofBooking} with {nameofBookRef} \"{BookRef}\" paid",

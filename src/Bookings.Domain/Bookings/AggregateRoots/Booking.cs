@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using Bookings.Domain.Bookings.Abstractions;
 using Bookings.Domain.Bookings.Entities;
 using Bookings.Domain.Bookings.Enums;
@@ -13,6 +14,7 @@ public class Booking : AggregateRoot<IDomainEvent>
     public string CreatorId { get; }
     public BookRef BookRef { get; }
     public DateTime BookDate { get; }
+    public DateTime? ExpiresAt { get; private set; }
     public decimal TotalAmount { get; private set; }
     public BookingStatus Status { get; private set; }
 
@@ -24,6 +26,7 @@ public class Booking : AggregateRoot<IDomainEvent>
         string creatorId,
         BookRef bookRef, 
         DateTime bookDate,
+        TimeSpan expiresAfter,
         FareConditions fareConditions,
         IEnumerable<int> flightsIdsForTicket,
         IEnumerable<(
@@ -31,9 +34,11 @@ public class Booking : AggregateRoot<IDomainEvent>
             decimal TicketCost, 
             Passenger Passenger)> passengersTicketsInfo)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(expiresAfter, TimeSpan.Zero);
         CreatorId = creatorId;
         BookRef = bookRef;
         BookDate = bookDate;
+        ExpiresAt = BookDate + expiresAfter;
         TotalAmount = 0;
         _tickets = [];
         Status = BookingStatus.Pending; 
@@ -52,10 +57,14 @@ public class Booking : AggregateRoot<IDomainEvent>
         AddDomainEvent(new BookingCreated(BookRef));
     }
 
-    public void MarkAsPaid()
+    public void MarkAsPaid(DateTime confirmationDate)
     {
         if (Status is BookingStatus.Pending)
         {
+            if (ExpiresAt!.Value > confirmationDate)
+                throw new InvalidDomainOperationException(
+                    "Cannot mark booking as paid because the payment time limit has expired");
+            ExpiresAt = null;
             Status = BookingStatus.Paid;
             AddDomainEvent(new BookingPaid(BookRef));
         }
@@ -65,7 +74,7 @@ public class Booking : AggregateRoot<IDomainEvent>
             {
                 BookingStatus.Paid => "already paid",
                 BookingStatus.Cancelled => "cancelled",
-                _ => throw new ArgumentException($"Booking doesn't support {nameof(Status)} {Status}")
+                _ => throw new ArgumentException($"{nameof(Booking)} doesn't support {nameof(Status)} {Status}")
             };
             throw new InvalidDomainOperationException($"Cannot mark booking as paid because {reason}");
         }
@@ -75,6 +84,7 @@ public class Booking : AggregateRoot<IDomainEvent>
     {
         if (Status is BookingStatus.Pending)
         {
+            ExpiresAt = null;
             Status = BookingStatus.Cancelled;
             AddDomainEvent(new BookingCancelled(BookRef));
         }

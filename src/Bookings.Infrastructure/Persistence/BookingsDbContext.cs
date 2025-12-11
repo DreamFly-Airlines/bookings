@@ -151,6 +151,9 @@ public partial class BookingsDbContext : DbContext
             entity.Property(e => e.BookDate)
                 .HasComment("Booking date")
                 .HasColumnName("book_date");
+            entity.Property(e => e.ExpiresAt)
+                .HasComment("Booking payment time limit")
+                .HasColumnName("expires_at");
             entity.Property(e => e.TotalAmount)
                 .HasPrecision(10, 2)
                 .HasComment("Total booking cost")

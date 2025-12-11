@@ -1,4 +1,5 @@
-﻿using Bookings.Application.Bookings.Exceptions;
+﻿using Bookings.Application.Bookings.Configuration;
+using Bookings.Application.Bookings.Exceptions;
 using Bookings.Application.Bookings.Services;
 using Bookings.Domain.Bookings.Abstractions;
 using Bookings.Domain.Bookings.AggregateRoots;
@@ -7,11 +8,13 @@ using Bookings.Domain.Bookings.Exceptions;
 using Bookings.Domain.Bookings.Repositories;
 using Bookings.Domain.Bookings.ValueObjects;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Shared.Abstractions.Commands;
 
 namespace Bookings.Application.Bookings.Commands;
 
 public class MakeBookingCommandHandler(
+    IOptions<BookingOptions> bookingOptions,
     ILogger<MakeBookingCommandHandler> logger,
     IItineraryPricingService pricingService,
     IClockService clockService,
@@ -52,8 +55,12 @@ public class MakeBookingCommandHandler(
             });
         var bookDate = await clockService.NowAsync(cancellationToken);
         var booking = new Booking(
-            command.CreatorId, bookRef, bookDate, 
-            TimeSpan.FromMinutes(5), command.FareConditions, command.ItineraryFlightsIds, ticketsInfo);
+            command.CreatorId,
+            bookRef, bookDate,
+            bookingOptions.Value.ExpiresIn,
+            command.FareConditions,
+            command.ItineraryFlightsIds,
+            ticketsInfo);
         await bookingRepository.AddAsync(booking, cancellationToken);
         logger.LogInformation(
             "{nameofBooking} with {nameofBookRef} \"{BookingBookRef}\" created",

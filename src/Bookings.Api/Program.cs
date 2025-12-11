@@ -1,6 +1,7 @@
 using Bookings.Api.ExceptionHandling;
 using Bookings.Api.Extensions;
 using Bookings.Application.Bookings.Commands;
+using Bookings.Application.Bookings.Configuration;
 using Bookings.Application.Bookings.EventHandlers;
 using Bookings.Application.Bookings.Queries;
 using Bookings.Application.Bookings.Repositories;
@@ -26,6 +27,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddNpgsql<BookingsDbContext>(
     builder.Configuration.GetConnectionString("BookingsDb"), 
     o => o.CommandTimeout(180));
+builder.Services.Configure<BookingOptions>(builder.Configuration.GetSection(nameof(BookingOptions)));
 
 builder.Services.AddScoped<IQuerySender, ServiceProviderQuerySender>();
 builder.Services.AddScoped<ICommandSender, ServiceProviderCommandSender>();

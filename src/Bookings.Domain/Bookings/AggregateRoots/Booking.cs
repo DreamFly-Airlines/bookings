@@ -26,7 +26,7 @@ public class Booking : AggregateRoot<IDomainEvent>
         string creatorId,
         BookRef bookRef, 
         DateTime bookDate,
-        TimeSpan expiresAfter,
+        TimeSpan expiresIn,
         FareConditions fareConditions,
         IEnumerable<int> flightsIdsForTicket,
         IEnumerable<(
@@ -34,11 +34,11 @@ public class Booking : AggregateRoot<IDomainEvent>
             decimal TicketCost, 
             Passenger Passenger)> passengersTicketsInfo)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(expiresAfter, TimeSpan.Zero);
+        ArgumentOutOfRangeException.ThrowIfLessThan(expiresIn, TimeSpan.Zero);
         CreatorId = creatorId;
         BookRef = bookRef;
         BookDate = bookDate;
-        ExpiresAt = BookDate + expiresAfter;
+        ExpiresAt = BookDate + expiresIn;
         TotalAmount = 0;
         _tickets = [];
         Status = BookingStatus.Pending; 

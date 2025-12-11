@@ -61,7 +61,7 @@ public class Booking : AggregateRoot<IDomainEvent>
     {
         if (Status is BookingStatus.Pending)
         {
-            if (ExpiresAt!.Value > confirmationDate)
+            if (confirmationDate > ExpiresAt!.Value)
                 throw new InvalidDomainOperationException(
                     "Cannot mark booking as paid because the payment time limit has expired");
             ExpiresAt = null;
